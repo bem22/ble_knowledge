@@ -1,7 +1,24 @@
 #include <glib.h>
 #include <gio/gio.h>
+#include <stdio.h>
+
+void *handle_ble_connection() {
+    while(1) {
+        printf("%s", "Hello!!!!!\n");
+        sleep(1);
+
+    }
+
+}
 
 int main(void) {
+    pthread_t *ble_conn_watcher = (pthread_t*) malloc(sizeof(pthread_t));
+
+    // Start the thread that watches over interfaces
+    pthread_create(ble_conn_watcher, NULL, &handle_ble_connection, NULL);
+
+    pthread_join(*ble_conn_watcher, NULL);
+
     GError *err = NULL;
     GDBusConnection *conn = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &err);
 
@@ -74,6 +91,5 @@ int main(void) {
 
         g_print("%i", i);
     }
-
 
 }
