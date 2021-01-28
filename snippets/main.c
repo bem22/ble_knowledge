@@ -43,18 +43,37 @@ int main(void) {
     }
 
     if(result) {
-        g_variant_get_child_value(result, 0);
+        result = g_variant_get_child_value(result, 0);
+
         GVariantIter iter;
         g_variant_iter_init(&iter, result);
-
+        gchar *obj_path;
+        GVariant *if_prop;
         int i=0;
-        while(g_variant_iter_next(&iter, "a{oa{sa{sv}}}", NULL)) {
-            i++;
+        while(g_variant_iter_next(&iter, "{&o@a{sa{sv}}}", &obj_path, &if_prop)) {
+            g_print("%s\n", obj_path);
+            const gchar *iface_name;
+            GVariant *properties;
+            GVariantIter iter2;
+            g_variant_iter_init(&iter2, if_prop);
+            while(g_variant_iter_next(&iter2, "{&s@a{sv}}", &iface_name, &properties)) {
+                g_print("%s\n", iface_name);
+
+                GVariantIter iter3;
+                g_variant_iter_init(&iter3, properties);
+
+                gchar *prop_name;
+                GVariant *property;
+                while(g_variant_iter_next(&iter3, "{&s@v}", &prop_name, &property)) {
+                    g_print("%s\n", prop_name);
+                }
+                g_print("\n");
+            }
+            g_print("\n");
         }
 
         g_print("%i", i);
     }
-
 
 
 }
