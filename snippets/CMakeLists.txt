@@ -3,6 +3,16 @@ project(snippets C)
 
 set(CMAKE_C_STANDARD 99)
 
+# PTHREAD sets
+set(CMAKE_USE_PTHREADS_INIT true)
+set(CMAKE_USE_PTHREADS_INIT ON)
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_WIN32_THREADS_INIT 0)
+set(CMAKE_USE_PTHREADS_INIT 1)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+SET(CMAKE_C_FLAGS "-pthread -lrt ${CMAKE_C_FLAGS}")
+
 set(SOURCE_FILES main.c)
 include(FindPkgConfig)
 pkg_check_modules(GLIB glib-2.0 REQUIRED)
