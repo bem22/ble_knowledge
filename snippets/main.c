@@ -29,14 +29,14 @@ int main(void) {
         g_print("\n%s\n", "Connection to DBUS successful!");
     }
 
-    GDBusProxy *proxy = g_dbus_proxy_new_sync(conn,
-                                              G_DBUS_PROXY_FLAGS_NONE,
-                                              NULL,
-                                              "org.bluez",
-                                              "/",
-                                              "org.freedesktop.DBus.ObjectManager",
-                                              NULL,
-                                              &err);
+    GDBusProxy *beacon_proxy = g_dbus_proxy_new_sync(conn,
+                                                     G_DBUS_PROXY_FLAGS_NONE,
+                                                     NULL,
+                                                     "org.bluez",
+                                                     "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
+                                                     "org.bluez.Device1",
+                                                     NULL,
+                                                     &err);
 
     if(err != NULL) {
         g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
@@ -45,51 +45,39 @@ int main(void) {
         g_print("\n%s\n", "Proxy created successfully!");
     }
 
-    GVariant *result = g_dbus_proxy_call_sync(proxy,
-                                              "GetManagedObjects",
-                                              NULL,
-                                              G_DBUS_CALL_FLAGS_NONE,
-                                              -1,
-                                              NULL,
-                                              &err);
+    g_dbus_proxy_call_sync(beacon_proxy,
+                           "Connect",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while fetching data", err->message);
+        g_print("%s\n%s\n", "Error while calling a method through proxy123", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Data fetched successfully");
+        g_print("\n%s\n", "Proxy method call, successful!");
     }
 
-    if(result) {
-        result = g_variant_get_child_value(result, 0);
+    sleep(3);
 
-        GVariantIter iter;
-        g_variant_iter_init(&iter, result);
-        gchar *obj_path;
-        GVariant *if_prop;
-        int i=0;
-        while(g_variant_iter_next(&iter, "{&o@a{sa{sv}}}", &obj_path, &if_prop)) {
-            g_print("%s\n", obj_path);
-            const gchar *iface_name;
-            GVariant *properties;
-            GVariantIter iter2;
-            g_variant_iter_init(&iter2, if_prop);
-            while(g_variant_iter_next(&iter2, "{&s@a{sv}}", &iface_name, &properties)) {
-                g_print("%s\n", iface_name);
 
-                GVariantIter iter3;
-                g_variant_iter_init(&iter3, properties);
-
-                gchar *prop_name;
-                GVariant *property;
-                while(g_variant_iter_next(&iter3, "{&s@v}", &prop_name, &property)) {
-                    g_print("%s\n", prop_name);
-                }
-                g_print("\n");
-            }
-            g_print("\n");
-        }
-
-        g_print("%i", i);
+    GDBusProxy *gatt_proxy = g_dbus_proxy_new_sync(conn,
+                                                   G_DBUS_PROXY_FLAGS_NONE,
+                                                   NULL,
+                                                   "org.bluez",
+                                                   "/org/bluez/hci0/dev_DC_3F_32_42_62_B0/service0035/char0036",
+                                                   "org.bluez.GattCharacteristic1",
+                                                   NULL,
+                                                   &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Proxy created successfully!");
     }
+
+
+
 
 }
