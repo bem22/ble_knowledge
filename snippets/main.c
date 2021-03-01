@@ -1,37 +1,45 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <stdio.h>
-#include <pthread.h>
+#define AGENT_PATH "/org/bluez/AutoPinAgent"
+static void  hello_world(GDBusProxy          *proxy,
+                         GVariant            *changed_properties,
+                         const gchar* const  *invalidated_properties,
+                         gpointer             user_data) {
+    changed_properties = g_variant_get_child_value(changed_properties, 0);
+    GVariant *string = g_variant_get_child_value(changed_properties, 0);
+    GVariant *variant = g_variant_get_child_value(changed_properties, 1);
+    variant = g_variant_get_child_value(variant, 0);
+    if (g_variant_n_children (changed_properties) > 0) {
 
-void *handle_ble_connection() {
-    while(1) {
-        printf("%s", "Hello!!!!!\n");
-        sleep(1);
-
+        g_print("[1]\n");
     }
-
 }
 
-static void  hello_world(GDBusProxy *proxy, GAsyncResult *res) {
-    GVariant *result = NULL;
-    GError *err = NULL;
-    result = g_dbus_proxy_call_finish(proxy, res, &err);
 
-    if(err != NULL) {
-        g_print("%s\n%s\n", "Error while attempting to establish a connection with DBUS", err->message);
+static void  hello_world2(GDBusProxy          *proxy,
+                         GVariant            *changed_properties,
+                         const gchar* const  *invalidated_properties,
+                         gpointer             user_data) {
+    changed_properties = g_variant_get_child_value(changed_properties, 0);
+    GVariant *string = g_variant_get_child_value(changed_properties, 0);
+    GVariant *variant = g_variant_get_child_value(changed_properties, 1);
+    variant = g_variant_get_child_value(variant, 0);
+    if (g_variant_n_children (changed_properties) > 0) {
 
-    } else {
-        g_print("\n%s %s\n", "Connection to DBUS successful: ", g_variant_get_type_string(result));
+        g_print("[2]\n");
     }
-
 }
+
 
 int main(void) {
     GError *err = NULL;
-    GDBusConnection *conn = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &err);
-
     GMainLoop *loop;
     loop = g_main_loop_new(NULL, FALSE);
+
+    GDBusConnection *conn = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &err);
+
+
     if(err != NULL) {
         g_print("%s\n%s\n", "Error while attempting to establish a connection with DBUS", err->message);
         return 1;
@@ -39,40 +47,106 @@ int main(void) {
         g_print("\n%s\n", "Connection to DBUS successful!");
     }
 
-    GDBusProxy *beacon_proxy = g_dbus_proxy_new_sync(conn,
-                                                     G_DBUS_PROXY_FLAGS_NONE,
-                                                     NULL,
-                                                     "org.bluez",
-                                                     "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
-                                                     "org.bluez.Device1",
-                                                     NULL,
-                                                     &err);
+    /// BLINKS
 
+    GDBusProxy *agent_proxy = g_dbus_proxy_new_sync(conn,
+                                                    G_DBUS_PROXY_FLAGS_NONE,
+                                                    NULL,
+                                                    "org.bluez",
+                                                    "/org/bluez",
+                                                    "org.bluez.AgentManager1",
+                                                    NULL,
+                                                    &err);
     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
+        g_print("%s\n%s\n", "Error while attempting to create agent proxy", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Proxy created successfully!");
+        g_print("\n%s\n", "Agent proxy created!");
     }
 
-    g_dbus_proxy_call_sync(beacon_proxy,
+    g_dbus_proxy_call_sync(agent_proxy,
+                                              "RegisterAgent",
+                                              g_variant_new("(os)", AGENT_PATH, "NoInputNoOutput"),
+                                              G_DBUS_CALL_FLAGS_NONE,
+                                              -1,
+                                              NULL,
+                                              &err);
+
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to register agent", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Agent registered.");
+    }
+
+    GDBusProxy *properties = g_dbus_proxy_new_sync(conn,
+                                                   G_DBUS_PROXY_FLAGS_NONE,
+                                                   NULL,
+                                                   "org.bluez",
+                                                   "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
+                                                   "org.freedesktop.DBus.Properties",
+                                                   NULL,
+                                                   &err);
+
+    g_dbus_proxy_call_sync(properties,
+                           "Set",
+                           g_variant_new("(ssv)", "org.bluez.Device1", "Trusted", g_variant_new_boolean(TRUE)),
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Not so trusted", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Trusted");
+    }
+    GDBusProxy *proxee = g_dbus_proxy_new_sync(conn,
+                                               G_DBUS_PROXY_FLAGS_NONE,
+                                               NULL,
+                                               "org.bluez",
+                                               "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
+                                               "org.bluez.Device1",
+                                               NULL,
+                                               &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to create agent proxy", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Agent proxy created!");
+    }
+
+    g_dbus_proxy_call_sync(proxee,
+                           "Pair",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+
+     if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to create agent proxy", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Agent proxy created!");
+    }
+    g_dbus_proxy_call_sync(proxee,
                            "Connect",
                            NULL,
                            G_DBUS_CALL_FLAGS_NONE,
                            -1,
                            NULL,
                            &err);
+    sleep(2);
     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while calling a method through proxy123", err->message);
+        g_print("%s\n%s\n", "Error while attempting to connect to device", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Proxy method call, successful!");
+        g_print("\n%s\n", "Connected");
     }
 
-    sleep(3);
 
-
-    GDBusProxy *gatt_proxy = g_dbus_proxy_new_sync(conn,
+    GDBusProxy *gatt_proxy5 = g_dbus_proxy_new_sync(conn,
                                                    G_DBUS_PROXY_FLAGS_NONE,
                                                    NULL,
                                                    "org.bluez",
@@ -84,7 +158,7 @@ int main(void) {
         g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Proxy created successfully!");
+        g_print("\n%s\n", "GATT Proxy created successfully!");
     }
 
     for(int i=0; i<15; i++) {
@@ -99,7 +173,7 @@ int main(void) {
         GVariant *char_value = g_variant_new_from_data(G_VARIANT_TYPE("ay"), data, 1, TRUE, NULL, NULL);
 
 
-        GVariant *result = g_dbus_proxy_call_sync(gatt_proxy,
+        GVariant *result = g_dbus_proxy_call_sync(gatt_proxy5,
                                                   "WriteValue",
                                                   g_variant_new("(@ay@a{sv})", char_value, argument),
                                                   G_DBUS_CALL_FLAGS_NONE,
@@ -120,19 +194,24 @@ int main(void) {
                                                    G_DBUS_PROXY_FLAGS_NONE,
                                                    NULL,
                                                    "org.bluez",
-                                                   "/org/bluez/hci0/dev_DC_3F_32_42_62_B0/service0018/char0022",
+                                                   "/org/bluez/hci0/dev_DC_3F_32_42_62_B0/service0018/char0019",
                                                    "org.bluez.GattCharacteristic1",
                                                    NULL,
                                                    &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while starting notify", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Notify started!");
+    }
 
-    g_dbus_proxy_call(gatt_proxy2,
+    g_dbus_proxy_call_sync(gatt_proxy2,
                            "StartNotify",
                            NULL,
                            G_DBUS_CALL_FLAGS_NONE,
                            -1,
                            NULL,
-                           hello_world,
-                           NULL);
+                           &err);
     if(err != NULL) {
         g_print("%s\n%s\n", "Error while starting notify", err->message);
         return 1;
@@ -141,9 +220,19 @@ int main(void) {
     }
 
 
+    g_signal_connect(gatt_proxy2,
+                     "g-properties-changed",
+                     G_CALLBACK(hello_world),
+                     NULL);
+
+
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while starting notify", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Notify started!");
+    }
 
     g_main_loop_run(loop);
     g_object_unref(conn);
-
-
 }
