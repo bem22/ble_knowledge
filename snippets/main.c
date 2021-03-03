@@ -47,9 +47,7 @@ int main(void) {
         g_print("\n%s\n", "Connection to DBUS successful!");
     }
 
-    /// BLINKS
-
-    GDBusProxy *agent_proxy = g_dbus_proxy_new_sync(conn,
+    GDBusProxy *agent_manager_proxy = g_dbus_proxy_new_sync(conn,
                                                     G_DBUS_PROXY_FLAGS_NONE,
                                                     NULL,
                                                     "org.bluez",
@@ -64,13 +62,13 @@ int main(void) {
         g_print("\n%s\n", "Agent proxy created!");
     }
 
-    g_dbus_proxy_call_sync(agent_proxy,
-                                              "RegisterAgent",
-                                              g_variant_new("(os)", AGENT_PATH, "NoInputNoOutput"),
-                                              G_DBUS_CALL_FLAGS_NONE,
-                                              -1,
-                                              NULL,
-                                              &err);
+    g_dbus_proxy_call_sync(agent_manager_proxy,
+                          "RegisterAgent",
+                          g_variant_new("(os)", AGENT_PATH, "NoInputNoOutput"),
+                          G_DBUS_CALL_FLAGS_NONE,
+                          -1,
+                          NULL,
+                          &err);
 
     if(err != NULL) {
         g_print("%s\n%s\n", "Error while attempting to register agent", err->message);
@@ -79,7 +77,55 @@ int main(void) {
         g_print("\n%s\n", "Agent registered.");
     }
 
-    GDBusProxy *properties = g_dbus_proxy_new_sync(conn,
+    g_dbus_proxy_call_sync(agent_manager_proxy,
+                           "RequestDefaultAgent",
+                           g_variant_new("(o)", AGENT_PATH),
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to register agent", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Agent now default.");
+    }
+
+
+    GDBusProxy *adapter_proxy = g_dbus_proxy_new_sync(conn,
+                                                G_DBUS_PROXY_FLAGS_NONE,
+                                                NULL,
+                                                "org.bluez",
+                                                "/org/bluez/hci0",
+                                                "org.bluez.Adapter1",
+                                                NULL,
+                                                &err);
+
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Adapter proxy creation failed.", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Adapter proxy created");
+    }
+
+    g_dbus_proxy_call_sync(adapter_proxy,
+                           "StartDiscovery",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Start discovery failed", err->message);
+        return 1;
+    } else {
+        g_print("\n%s\n", "Start discovery");
+    }
+
+    sleep(10);
+
+    GDBusProxy *device_properties_proxy = g_dbus_proxy_new_sync(conn,
                                                    G_DBUS_PROXY_FLAGS_NONE,
                                                    NULL,
                                                    "org.bluez",
@@ -88,7 +134,7 @@ int main(void) {
                                                    NULL,
                                                    &err);
 
-    g_dbus_proxy_call_sync(properties,
+    g_dbus_proxy_call_sync(device_properties_proxy,
                            "Set",
                            g_variant_new("(ssv)", "org.bluez.Device1", "Trusted", g_variant_new_boolean(TRUE)),
                            G_DBUS_CALL_FLAGS_NONE,
@@ -101,49 +147,58 @@ int main(void) {
     } else {
         g_print("\n%s\n", "Trusted");
     }
-    GDBusProxy *proxee = g_dbus_proxy_new_sync(conn,
-                                               G_DBUS_PROXY_FLAGS_NONE,
-                                               NULL,
-                                               "org.bluez",
-                                               "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
-                                               "org.bluez.Device1",
-                                               NULL,
-                                               &err);
+
+    GDBusProxy *device_proxy = g_dbus_proxy_new_sync(conn,
+                                                     G_DBUS_PROXY_FLAGS_NONE,
+                                                     NULL,
+                                                     "org.bluez",
+                                                     "/org/bluez/hci0/dev_DC_3F_32_42_62_B0",
+                                                     "org.bluez.Device1",
+                                                     NULL,
+                                                     &err);
     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while attempting to create agent proxy", err->message);
+        g_print("%s\n%s\n", "Error while attempting to create device proxy", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Agent proxy created!");
+        g_print("\n%s\n", "Device proxy created!");
     }
 
-    g_dbus_proxy_call_sync(proxee,
+
+
+
+    g_dbus_proxy_call_sync(device_proxy,
                            "Pair",
                            NULL,
                            G_DBUS_CALL_FLAGS_NONE,
                            -1,
                            NULL,
                            &err);
-
-     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while attempting to create agent proxy", err->message);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Pair error", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Agent proxy created!");
+        g_print("\n%s\n", "Device paired!");
     }
-    g_dbus_proxy_call_sync(proxee,
+
+
+
+    /*
+    g_dbus_proxy_call_sync(device_proxy,
                            "Connect",
                            NULL,
                            G_DBUS_CALL_FLAGS_NONE,
                            -1,
                            NULL,
                            &err);
-    sleep(2);
     if(err != NULL) {
-        g_print("%s\n%s\n", "Error while attempting to connect to device", err->message);
+        g_print("%s\n%s\n", "Error while attempting to create device proxy", err->message);
         return 1;
     } else {
-        g_print("\n%s\n", "Connected");
+        g_print("\n%s\n", "Device connected!");
     }
+
+    sleep(3);
+
 
 
     GDBusProxy *gatt_proxy5 = g_dbus_proxy_new_sync(conn,
@@ -161,7 +216,7 @@ int main(void) {
         g_print("\n%s\n", "GATT Proxy created successfully!");
     }
 
-    for(int i=0; i<15; i++) {
+    /*for(int i=0; i<15; i++) {
         GVariantBuilder builder;
         g_variant_builder_init (&builder, G_VARIANT_TYPE("a{sv}"));
         GVariant *argument = g_variant_builder_end(&builder);
@@ -189,7 +244,6 @@ int main(void) {
 
         usleep(100);
     }
-
     GDBusProxy *gatt_proxy2 = g_dbus_proxy_new_sync(conn,
                                                    G_DBUS_PROXY_FLAGS_NONE,
                                                    NULL,
@@ -232,6 +286,8 @@ int main(void) {
     } else {
         g_print("\n%s\n", "Notify started!");
     }
+
+    */
 
     g_main_loop_run(loop);
     g_object_unref(conn);
