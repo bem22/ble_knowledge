@@ -14,8 +14,13 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 SET(CMAKE_C_FLAGS "-pthread -lrt ${CMAKE_C_FLAGS}")
 
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES beacon-daemon.c agent.c agent.h panoramalabs-objectmanager.c panoramalabs-objectmanager.h)
+
 include(FindPkgConfig)
+
+pkg_check_modules(GIO-UNIX gio-unix-2.0 REQUIRED)
+include_directories(${GIO-UNIX_INCLUDE_DIRS})
+
 pkg_check_modules(GLIB glib-2.0 REQUIRED)
 include_directories(${GLIB_INCLUDE_DIRS})
 
@@ -23,5 +28,7 @@ pkg_check_modules(GIO gio-2.0 REQUIRED)
 include_directories(${GIO_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} ${GIO-UNIX_LDFLAGS})
 target_link_libraries(${PROJECT_NAME} ${GLIB_LDFLAGS})
 target_link_libraries(${PROJECT_NAME} ${GIO_LDFLAGS})
