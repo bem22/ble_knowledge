@@ -6,8 +6,8 @@
  * LGPL linking clauses.
  */
 
-#ifndef __PANORAMALABS_OBJECTMANAGER_H__
-#define __PANORAMALABS_OBJECTMANAGER_H__
+#ifndef __PANORAMALABS_SERVICE_H__
+#define __PANORAMALABS_SERVICE_H__
 
 #include <gio/gio.h>
 
@@ -564,4 +564,4 @@ GDBusObjectManager *panorama_object_manager_client_new_for_bus_sync (
 
 G_END_DECLS
 
-#endif /* __PANORAMALABS_OBJECTMANAGER_H__ */
+#endif /* __PANORAMALABS_SERVICE_H__ */

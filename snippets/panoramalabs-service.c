@@ -10,7 +10,7 @@
 #  include "config.h"
 #endif
 
-#include "panoramalabs-objectmanager.h"
+#include "panoramalabs-service.h"
 
 #include <string.h>
 #ifdef G_OS_UNIX

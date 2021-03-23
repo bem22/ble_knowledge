@@ -1,4 +1,4 @@
-#include "panoramalabs-objectmanager.h"
+#include "panoramalabs-service.h"
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -166,11 +166,11 @@ main (gint argc, gchar *argv[])
 }
 /**
 
-gdbus-codegen --interface-prefix com.panoramalabs.GDBus.ObjectManager. \
-              --generate-c-code panoramalabs-objectmanager                        \
-              --c-namespace Agent                       \
+gdbus-codegen --interface-prefix com.panoramalabs. \
+              --generate-c-code panoramalabs-service                        \
+              --c-namespace Panorama                       \
               --c-generate-object-manager                 \
-              --generate-docbook panoramalabs-generated-docs                       \
-              panoramalabs-objectmanager.xml
+              --generate-docbook panoramalabs-service-generated-docs                       \
+              panoramalabs-service.xml
 
 **/
