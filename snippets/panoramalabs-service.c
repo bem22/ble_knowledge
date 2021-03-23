@@ -179,11 +179,11 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_rel
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
@@ -192,15 +192,15 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_unnamed_arg0.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_objectpath.parent_struct,
   NULL
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pincode =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "pincode",
     (gchar *) "s",
     NULL
   },
@@ -209,7 +209,7 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_unnamed_arg1.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pincode.parent_struct,
   NULL
 };
 
@@ -226,22 +226,22 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_req
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pincode =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "pincode",
     (gchar *) "s",
     NULL
   },
@@ -250,8 +250,8 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_displa
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_unnamed_arg0.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_unnamed_arg1.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_objectpath.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pincode.parent_struct,
   NULL
 };
 
@@ -268,11 +268,11 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_dis
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
@@ -281,15 +281,15 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_unnamed_arg0.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_objectpath.parent_struct,
   NULL
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_passkey =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "passkey",
     (gchar *) "u",
     NULL
   },
@@ -298,7 +298,7 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_unnamed_arg1.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_passkey.parent_struct,
   NULL
 };
 
@@ -315,33 +315,33 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_req
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_passkey =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "passkey",
     (gchar *) "u",
     NULL
   },
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg2 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_entered =
 {
   {
     -1,
-    (gchar *) "unnamed_arg2",
+    (gchar *) "entered",
     (gchar *) "q",
     NULL
   },
@@ -350,9 +350,9 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_displa
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg0.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg1.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_unnamed_arg2.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_objectpath.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_passkey.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_entered.parent_struct,
   NULL
 };
 
@@ -369,22 +369,22 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_dis
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_bjectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "bjectpath",
     (gchar *) "o",
     NULL
   },
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_passkey =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "passkey",
     (gchar *) "u",
     NULL
   },
@@ -393,8 +393,8 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_unnamed_arg0.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_unnamed_arg1.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_bjectpath.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_passkey.parent_struct,
   NULL
 };
 
@@ -411,11 +411,11 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_req
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
@@ -424,7 +424,7 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_reques
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_unnamed_arg0.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_objectpath.parent_struct,
   NULL
 };
 
@@ -441,22 +441,22 @@ static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_req
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_unnamed_arg0 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_objectpath =
 {
   {
     -1,
-    (gchar *) "unnamed_arg0",
+    (gchar *) "objectpath",
     (gchar *) "o",
     NULL
   },
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_unnamed_arg1 =
+static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_uuid =
 {
   {
     -1,
-    (gchar *) "unnamed_arg1",
+    (gchar *) "uuid",
     (gchar *) "s",
     NULL
   },
@@ -465,8 +465,8 @@ static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_author
 
 static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_pointers[] =
 {
-  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_unnamed_arg0.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_unnamed_arg1.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_objectpath.parent_struct,
+  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_uuid.parent_struct,
   NULL
 };
 
@@ -610,7 +610,7 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-request-pin-code:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode()</link> D-Bus method.
    *
@@ -633,8 +633,8 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-display-pin-code:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
-   * @arg_unnamed_arg1: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
+   * @arg_pincode: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode()</link> D-Bus method.
    *
@@ -657,7 +657,7 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-request-passkey:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey()</link> D-Bus method.
    *
@@ -680,9 +680,9 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-display-passkey:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
-   * @arg_unnamed_arg1: Argument passed by remote caller.
-   * @arg_unnamed_arg2: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
+   * @arg_passkey: Argument passed by remote caller.
+   * @arg_entered: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey()</link> D-Bus method.
    *
@@ -705,8 +705,8 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-request-confirmation:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
-   * @arg_unnamed_arg1: Argument passed by remote caller.
+   * @arg_bjectpath: Argument passed by remote caller.
+   * @arg_passkey: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation()</link> D-Bus method.
    *
@@ -729,7 +729,7 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-request-authorization:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization()</link> D-Bus method.
    *
@@ -752,8 +752,8 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
    * PanoramaOrgBluezAgent1::handle-authorize-service:
    * @object: A #PanoramaOrgBluezAgent1.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_unnamed_arg0: Argument passed by remote caller.
-   * @arg_unnamed_arg1: Argument passed by remote caller.
+   * @arg_objectpath: Argument passed by remote caller.
+   * @arg_uuid: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService()</link> D-Bus method.
    *
@@ -891,7 +891,7 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_pin_code:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -905,7 +905,7 @@ _out:
 void
 panorama_org_bluez_agent1_call_request_pin_code (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -913,7 +913,7 @@ panorama_org_bluez_agent1_call_request_pin_code (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "RequestPinCode",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -924,7 +924,7 @@ panorama_org_bluez_agent1_call_request_pin_code (
 /**
  * panorama_org_bluez_agent1_call_request_pin_code_finish:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @out_unnamed_arg1: (out) (optional): Return location for return parameter or %NULL to ignore.
+ * @out_pincode: (out) (optional): Return location for return parameter or %NULL to ignore.
  * @res: The #GAsyncResult obtained from the #GAsyncReadyCallback passed to panorama_org_bluez_agent1_call_request_pin_code().
  * @error: Return location for error or %NULL.
  *
@@ -935,7 +935,7 @@ panorama_org_bluez_agent1_call_request_pin_code (
 gboolean
 panorama_org_bluez_agent1_call_request_pin_code_finish (
     PanoramaOrgBluezAgent1 *proxy,
-    gchar **out_unnamed_arg1,
+    gchar **out_pincode,
     GAsyncResult *res,
     GError **error)
 {
@@ -945,7 +945,7 @@ panorama_org_bluez_agent1_call_request_pin_code_finish (
     goto _out;
   g_variant_get (_ret,
                  "(s)",
-                 out_unnamed_arg1);
+                 out_pincode);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -954,8 +954,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_pin_code_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @out_unnamed_arg1: (out) (optional): Return location for return parameter or %NULL to ignore.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @out_pincode: (out) (optional): Return location for return parameter or %NULL to ignore.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -968,8 +968,8 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_request_pin_code_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    gchar **out_unnamed_arg1,
+    const gchar *arg_objectpath,
+    gchar **out_pincode,
     GCancellable *cancellable,
     GError **error)
 {
@@ -977,7 +977,7 @@ panorama_org_bluez_agent1_call_request_pin_code_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "RequestPinCode",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -986,7 +986,7 @@ panorama_org_bluez_agent1_call_request_pin_code_sync (
     goto _out;
   g_variant_get (_ret,
                  "(s)",
-                 out_unnamed_arg1);
+                 out_pincode);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -995,8 +995,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_display_pin_code:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_pincode: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1010,8 +1010,8 @@ _out:
 void
 panorama_org_bluez_agent1_call_display_pin_code (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_pincode,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1019,8 +1019,8 @@ panorama_org_bluez_agent1_call_display_pin_code (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "DisplayPinCode",
     g_variant_new ("(os)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_objectpath,
+                   arg_pincode),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1058,8 +1058,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_display_pin_code_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_pincode: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1072,8 +1072,8 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_display_pin_code_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_pincode,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1081,8 +1081,8 @@ panorama_org_bluez_agent1_call_display_pin_code_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "DisplayPinCode",
     g_variant_new ("(os)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_objectpath,
+                   arg_pincode),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1099,7 +1099,7 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_passkey:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1113,7 +1113,7 @@ _out:
 void
 panorama_org_bluez_agent1_call_request_passkey (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1121,7 +1121,7 @@ panorama_org_bluez_agent1_call_request_passkey (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "RequestPasskey",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1132,7 +1132,7 @@ panorama_org_bluez_agent1_call_request_passkey (
 /**
  * panorama_org_bluez_agent1_call_request_passkey_finish:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @out_unnamed_arg1: (out) (optional): Return location for return parameter or %NULL to ignore.
+ * @out_passkey: (out) (optional): Return location for return parameter or %NULL to ignore.
  * @res: The #GAsyncResult obtained from the #GAsyncReadyCallback passed to panorama_org_bluez_agent1_call_request_passkey().
  * @error: Return location for error or %NULL.
  *
@@ -1143,7 +1143,7 @@ panorama_org_bluez_agent1_call_request_passkey (
 gboolean
 panorama_org_bluez_agent1_call_request_passkey_finish (
     PanoramaOrgBluezAgent1 *proxy,
-    guint *out_unnamed_arg1,
+    guint *out_passkey,
     GAsyncResult *res,
     GError **error)
 {
@@ -1153,7 +1153,7 @@ panorama_org_bluez_agent1_call_request_passkey_finish (
     goto _out;
   g_variant_get (_ret,
                  "(u)",
-                 out_unnamed_arg1);
+                 out_passkey);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -1162,8 +1162,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_passkey_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @out_unnamed_arg1: (out) (optional): Return location for return parameter or %NULL to ignore.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @out_passkey: (out) (optional): Return location for return parameter or %NULL to ignore.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1176,8 +1176,8 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_request_passkey_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint *out_unnamed_arg1,
+    const gchar *arg_objectpath,
+    guint *out_passkey,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1185,7 +1185,7 @@ panorama_org_bluez_agent1_call_request_passkey_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "RequestPasskey",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1194,7 +1194,7 @@ panorama_org_bluez_agent1_call_request_passkey_sync (
     goto _out;
   g_variant_get (_ret,
                  "(u)",
-                 out_unnamed_arg1);
+                 out_passkey);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -1203,9 +1203,9 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_display_passkey:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
- * @arg_unnamed_arg2: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_passkey: Argument to pass with the method invocation.
+ * @arg_entered: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1219,9 +1219,9 @@ _out:
 void
 panorama_org_bluez_agent1_call_display_passkey (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
-    guint16 arg_unnamed_arg2,
+    const gchar *arg_objectpath,
+    guint arg_passkey,
+    guint16 arg_entered,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1229,9 +1229,9 @@ panorama_org_bluez_agent1_call_display_passkey (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "DisplayPasskey",
     g_variant_new ("(ouq)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1,
-                   arg_unnamed_arg2),
+                   arg_objectpath,
+                   arg_passkey,
+                   arg_entered),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1269,9 +1269,9 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_display_passkey_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
- * @arg_unnamed_arg2: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_passkey: Argument to pass with the method invocation.
+ * @arg_entered: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1284,9 +1284,9 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_display_passkey_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
-    guint16 arg_unnamed_arg2,
+    const gchar *arg_objectpath,
+    guint arg_passkey,
+    guint16 arg_entered,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1294,9 +1294,9 @@ panorama_org_bluez_agent1_call_display_passkey_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "DisplayPasskey",
     g_variant_new ("(ouq)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1,
-                   arg_unnamed_arg2),
+                   arg_objectpath,
+                   arg_passkey,
+                   arg_entered),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1313,8 +1313,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_confirmation:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_bjectpath: Argument to pass with the method invocation.
+ * @arg_passkey: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1328,8 +1328,8 @@ _out:
 void
 panorama_org_bluez_agent1_call_request_confirmation (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
+    const gchar *arg_bjectpath,
+    guint arg_passkey,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1337,8 +1337,8 @@ panorama_org_bluez_agent1_call_request_confirmation (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "RequestConfirmation",
     g_variant_new ("(ou)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_bjectpath,
+                   arg_passkey),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1376,8 +1376,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_confirmation_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_bjectpath: Argument to pass with the method invocation.
+ * @arg_passkey: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1390,8 +1390,8 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_request_confirmation_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
+    const gchar *arg_bjectpath,
+    guint arg_passkey,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1399,8 +1399,8 @@ panorama_org_bluez_agent1_call_request_confirmation_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "RequestConfirmation",
     g_variant_new ("(ou)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_bjectpath,
+                   arg_passkey),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1417,7 +1417,7 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_authorization:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1431,7 +1431,7 @@ _out:
 void
 panorama_org_bluez_agent1_call_request_authorization (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1439,7 +1439,7 @@ panorama_org_bluez_agent1_call_request_authorization (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "RequestAuthorization",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1477,7 +1477,7 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_request_authorization_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1490,7 +1490,7 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_request_authorization_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1498,7 +1498,7 @@ panorama_org_bluez_agent1_call_request_authorization_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "RequestAuthorization",
     g_variant_new ("(o)",
-                   arg_unnamed_arg0),
+                   arg_objectpath),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1515,8 +1515,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_authorize_service:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_uuid: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -1530,8 +1530,8 @@ _out:
 void
 panorama_org_bluez_agent1_call_authorize_service (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_uuid,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -1539,8 +1539,8 @@ panorama_org_bluez_agent1_call_authorize_service (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "AuthorizeService",
     g_variant_new ("(os)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_objectpath,
+                   arg_uuid),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1578,8 +1578,8 @@ _out:
 /**
  * panorama_org_bluez_agent1_call_authorize_service_sync:
  * @proxy: A #PanoramaOrgBluezAgent1Proxy.
- * @arg_unnamed_arg0: Argument to pass with the method invocation.
- * @arg_unnamed_arg1: Argument to pass with the method invocation.
+ * @arg_objectpath: Argument to pass with the method invocation.
+ * @arg_uuid: Argument to pass with the method invocation.
  * @cancellable: (nullable): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -1592,8 +1592,8 @@ _out:
 gboolean
 panorama_org_bluez_agent1_call_authorize_service_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_uuid,
     GCancellable *cancellable,
     GError **error)
 {
@@ -1601,8 +1601,8 @@ panorama_org_bluez_agent1_call_authorize_service_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "AuthorizeService",
     g_variant_new ("(os)",
-                   arg_unnamed_arg0,
-                   arg_unnamed_arg1),
+                   arg_objectpath,
+                   arg_uuid),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -1730,7 +1730,7 @@ panorama_org_bluez_agent1_complete_release (
  * panorama_org_bluez_agent1_complete_request_pin_code:
  * @object: A #PanoramaOrgBluezAgent1.
  * @invocation: (transfer full): A #GDBusMethodInvocation.
- * @unnamed_arg1: Parameter to return.
+ * @pincode: Parameter to return.
  *
  * Helper function used in service implementations to finish handling invocations of the <link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode()</link> D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
  *
@@ -1740,11 +1740,11 @@ void
 panorama_org_bluez_agent1_complete_request_pin_code (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *unnamed_arg1)
+    const gchar *pincode)
 {
   g_dbus_method_invocation_return_value (invocation,
     g_variant_new ("(s)",
-                   unnamed_arg1));
+                   pincode));
 }
 
 /**
@@ -1769,7 +1769,7 @@ panorama_org_bluez_agent1_complete_display_pin_code (
  * panorama_org_bluez_agent1_complete_request_passkey:
  * @object: A #PanoramaOrgBluezAgent1.
  * @invocation: (transfer full): A #GDBusMethodInvocation.
- * @unnamed_arg1: Parameter to return.
+ * @passkey: Parameter to return.
  *
  * Helper function used in service implementations to finish handling invocations of the <link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey()</link> D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
  *
@@ -1779,11 +1779,11 @@ void
 panorama_org_bluez_agent1_complete_request_passkey (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    guint unnamed_arg1)
+    guint passkey)
 {
   g_dbus_method_invocation_return_value (invocation,
     g_variant_new ("(u)",
-                   unnamed_arg1));
+                   passkey));
 }
 
 /**

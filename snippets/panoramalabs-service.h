@@ -33,8 +33,8 @@ struct _PanoramaOrgBluezAgent1Iface
   gboolean (*handle_authorize_service) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1);
+    const gchar *arg_objectpath,
+    const gchar *arg_uuid);
 
   gboolean (*handle_cancel) (
     PanoramaOrgBluezAgent1 *object,
@@ -43,15 +43,15 @@ struct _PanoramaOrgBluezAgent1Iface
   gboolean (*handle_display_passkey) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
-    guint16 arg_unnamed_arg2);
+    const gchar *arg_objectpath,
+    guint arg_passkey,
+    guint16 arg_entered);
 
   gboolean (*handle_display_pin_code) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1);
+    const gchar *arg_objectpath,
+    const gchar *arg_pincode);
 
   gboolean (*handle_release) (
     PanoramaOrgBluezAgent1 *object,
@@ -60,23 +60,23 @@ struct _PanoramaOrgBluezAgent1Iface
   gboolean (*handle_request_authorization) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0);
+    const gchar *arg_objectpath);
 
   gboolean (*handle_request_confirmation) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1);
+    const gchar *arg_bjectpath,
+    guint arg_passkey);
 
   gboolean (*handle_request_passkey) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0);
+    const gchar *arg_objectpath);
 
   gboolean (*handle_request_pin_code) (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_unnamed_arg0);
+    const gchar *arg_objectpath);
 
 };
 
@@ -94,7 +94,7 @@ void panorama_org_bluez_agent1_complete_release (
 void panorama_org_bluez_agent1_complete_request_pin_code (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    const gchar *unnamed_arg1);
+    const gchar *pincode);
 
 void panorama_org_bluez_agent1_complete_display_pin_code (
     PanoramaOrgBluezAgent1 *object,
@@ -103,7 +103,7 @@ void panorama_org_bluez_agent1_complete_display_pin_code (
 void panorama_org_bluez_agent1_complete_request_passkey (
     PanoramaOrgBluezAgent1 *object,
     GDBusMethodInvocation *invocation,
-    guint unnamed_arg1);
+    guint passkey);
 
 void panorama_org_bluez_agent1_complete_display_passkey (
     PanoramaOrgBluezAgent1 *object,
@@ -146,28 +146,28 @@ gboolean panorama_org_bluez_agent1_call_release_sync (
 
 void panorama_org_bluez_agent1_call_request_pin_code (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
 
 gboolean panorama_org_bluez_agent1_call_request_pin_code_finish (
     PanoramaOrgBluezAgent1 *proxy,
-    gchar **out_unnamed_arg1,
+    gchar **out_pincode,
     GAsyncResult *res,
     GError **error);
 
 gboolean panorama_org_bluez_agent1_call_request_pin_code_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    gchar **out_unnamed_arg1,
+    const gchar *arg_objectpath,
+    gchar **out_pincode,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_display_pin_code (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_pincode,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -179,36 +179,36 @@ gboolean panorama_org_bluez_agent1_call_display_pin_code_finish (
 
 gboolean panorama_org_bluez_agent1_call_display_pin_code_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_pincode,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_request_passkey (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
 
 gboolean panorama_org_bluez_agent1_call_request_passkey_finish (
     PanoramaOrgBluezAgent1 *proxy,
-    guint *out_unnamed_arg1,
+    guint *out_passkey,
     GAsyncResult *res,
     GError **error);
 
 gboolean panorama_org_bluez_agent1_call_request_passkey_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint *out_unnamed_arg1,
+    const gchar *arg_objectpath,
+    guint *out_passkey,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_display_passkey (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
-    guint16 arg_unnamed_arg2,
+    const gchar *arg_objectpath,
+    guint arg_passkey,
+    guint16 arg_entered,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -220,16 +220,16 @@ gboolean panorama_org_bluez_agent1_call_display_passkey_finish (
 
 gboolean panorama_org_bluez_agent1_call_display_passkey_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
-    guint16 arg_unnamed_arg2,
+    const gchar *arg_objectpath,
+    guint arg_passkey,
+    guint16 arg_entered,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_request_confirmation (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
+    const gchar *arg_bjectpath,
+    guint arg_passkey,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -241,14 +241,14 @@ gboolean panorama_org_bluez_agent1_call_request_confirmation_finish (
 
 gboolean panorama_org_bluez_agent1_call_request_confirmation_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    guint arg_unnamed_arg1,
+    const gchar *arg_bjectpath,
+    guint arg_passkey,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_request_authorization (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -260,14 +260,14 @@ gboolean panorama_org_bluez_agent1_call_request_authorization_finish (
 
 gboolean panorama_org_bluez_agent1_call_request_authorization_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
+    const gchar *arg_objectpath,
     GCancellable *cancellable,
     GError **error);
 
 void panorama_org_bluez_agent1_call_authorize_service (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_uuid,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -279,8 +279,8 @@ gboolean panorama_org_bluez_agent1_call_authorize_service_finish (
 
 gboolean panorama_org_bluez_agent1_call_authorize_service_sync (
     PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_unnamed_arg0,
-    const gchar *arg_unnamed_arg1,
+    const gchar *arg_objectpath,
+    const gchar *arg_uuid,
     GCancellable *cancellable,
     GError **error);
 

@@ -9,20 +9,20 @@
     <title role="synopsis.title">Methods</title>
     <synopsis>
 <link linkend="gdbus-method-org-bluez-Agent1.Release">Release</link>              ();
-<link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode</link>       (IN  o unnamed_arg0,
-                      OUT s unnamed_arg1);
-<link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode</link>       (IN  o unnamed_arg0,
-                      IN  s unnamed_arg1);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey</link>       (IN  o unnamed_arg0,
-                      OUT u unnamed_arg1);
-<link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey</link>       (IN  o unnamed_arg0,
-                      IN  u unnamed_arg1,
-                      IN  q unnamed_arg2);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation</link>  (IN  o unnamed_arg0,
-                      IN  u unnamed_arg1);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization</link> (IN  o unnamed_arg0);
-<link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService</link>     (IN  o unnamed_arg0,
-                      IN  s unnamed_arg1);
+<link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode</link>       (IN  o objectpath,
+                      OUT s pincode);
+<link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode</link>       (IN  o objectpath,
+                      IN  s pincode);
+<link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey</link>       (IN  o objectpath,
+                      OUT u passkey);
+<link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey</link>       (IN  o objectpath,
+                      IN  u passkey,
+                      IN  q entered);
+<link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation</link>  (IN  o bjectpath,
+                      IN  u passkey);
+<link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization</link> (IN  o objectpath);
+<link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService</link>     (IN  o objectpath,
+                      IN  s uuid);
 <link linkend="gdbus-method-org-bluez-Agent1.Cancel">Cancel</link>               ();
 </synopsis>
   </refsynopsisdiv>
@@ -44,17 +44,17 @@ Release ();
   <title>The RequestPinCode() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPinCode"><primary sortas="org.bluez.Agent1.RequestPinCode">org.bluez.Agent1.RequestPinCode()</primary></indexterm>
 <programlisting>
-RequestPinCode (IN  o unnamed_arg0,
-                OUT s unnamed_arg1);
+RequestPinCode (IN  o objectpath,
+                OUT s pincode);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>OUT s <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>OUT s <parameter>pincode</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -63,17 +63,17 @@ RequestPinCode (IN  o unnamed_arg0,
   <title>The DisplayPinCode() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPinCode"><primary sortas="org.bluez.Agent1.DisplayPinCode">org.bluez.Agent1.DisplayPinCode()</primary></indexterm>
 <programlisting>
-DisplayPinCode (IN  o unnamed_arg0,
-                IN  s unnamed_arg1);
+DisplayPinCode (IN  o objectpath,
+                IN  s pincode);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>IN s <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>IN s <parameter>pincode</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -82,17 +82,17 @@ DisplayPinCode (IN  o unnamed_arg0,
   <title>The RequestPasskey() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPasskey"><primary sortas="org.bluez.Agent1.RequestPasskey">org.bluez.Agent1.RequestPasskey()</primary></indexterm>
 <programlisting>
-RequestPasskey (IN  o unnamed_arg0,
-                OUT u unnamed_arg1);
+RequestPasskey (IN  o objectpath,
+                OUT u passkey);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>OUT u <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>OUT u <parameter>passkey</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -101,22 +101,22 @@ RequestPasskey (IN  o unnamed_arg0,
   <title>The DisplayPasskey() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPasskey"><primary sortas="org.bluez.Agent1.DisplayPasskey">org.bluez.Agent1.DisplayPasskey()</primary></indexterm>
 <programlisting>
-DisplayPasskey (IN  o unnamed_arg0,
-                IN  u unnamed_arg1,
-                IN  q unnamed_arg2);
+DisplayPasskey (IN  o objectpath,
+                IN  u passkey,
+                IN  q entered);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>IN u <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>IN u <parameter>passkey</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>IN q <parameter>unnamed_arg2</parameter></literal>:</term>
+  <term><literal>IN q <parameter>entered</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -125,17 +125,17 @@ DisplayPasskey (IN  o unnamed_arg0,
   <title>The RequestConfirmation() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.RequestConfirmation"><primary sortas="org.bluez.Agent1.RequestConfirmation">org.bluez.Agent1.RequestConfirmation()</primary></indexterm>
 <programlisting>
-RequestConfirmation (IN  o unnamed_arg0,
-                     IN  u unnamed_arg1);
+RequestConfirmation (IN  o bjectpath,
+                     IN  u passkey);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>bjectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>IN u <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>IN u <parameter>passkey</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -144,12 +144,12 @@ RequestConfirmation (IN  o unnamed_arg0,
   <title>The RequestAuthorization() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.RequestAuthorization"><primary sortas="org.bluez.Agent1.RequestAuthorization">org.bluez.Agent1.RequestAuthorization()</primary></indexterm>
 <programlisting>
-RequestAuthorization (IN  o unnamed_arg0);
+RequestAuthorization (IN  o objectpath);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
@@ -158,17 +158,17 @@ RequestAuthorization (IN  o unnamed_arg0);
   <title>The AuthorizeService() method</title>
   <indexterm zone="gdbus-method-org-bluez-Agent1.AuthorizeService"><primary sortas="org.bluez.Agent1.AuthorizeService">org.bluez.Agent1.AuthorizeService()</primary></indexterm>
 <programlisting>
-AuthorizeService (IN  o unnamed_arg0,
-                  IN  s unnamed_arg1);
+AuthorizeService (IN  o objectpath,
+                  IN  s uuid);
 </programlisting>
 <para></para>
 <variablelist role="params">
 <varlistentry>
-  <term><literal>IN o <parameter>unnamed_arg0</parameter></literal>:</term>
+  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 <varlistentry>
-  <term><literal>IN s <parameter>unnamed_arg1</parameter></literal>:</term>
+  <term><literal>IN s <parameter>uuid</parameter></literal>:</term>
   <listitem><para></para></listitem>
 </varlistentry>
 </variablelist>
