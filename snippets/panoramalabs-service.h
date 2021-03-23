@@ -22,283 +22,286 @@ G_BEGIN_DECLS
 #define PANORAMA_IS_ORG_BLUEZ_AGENT1(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), PANORAMA_TYPE_ORG_BLUEZ_AGENT1))
 #define PANORAMA_ORG_BLUEZ_AGENT1_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), PANORAMA_TYPE_ORG_BLUEZ_AGENT1, PanoramaOrgBluezAgent1Iface))
 
+
+// Main DBUS connection
+GDBusConnection *conn;
+
 struct _PanoramaOrgBluezAgent1;
 typedef struct _PanoramaOrgBluezAgent1 PanoramaOrgBluezAgent1;
 typedef struct _PanoramaOrgBluezAgent1Iface PanoramaOrgBluezAgent1Iface;
 
-struct _PanoramaOrgBluezAgent1Iface
-{
-  GTypeInterface parent_iface;
+struct _PanoramaOrgBluezAgent1Iface {
+    GTypeInterface parent_iface;
 
-  gboolean (*handle_authorize_service) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath,
-    const gchar *arg_uuid);
+    gboolean (*handle_authorize_service)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath,
+            const gchar *arg_uuid);
 
-  gboolean (*handle_cancel) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+    gboolean (*handle_cancel)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation);
 
-  gboolean (*handle_display_passkey) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath,
-    guint arg_passkey,
-    guint16 arg_entered);
+    gboolean (*handle_display_passkey)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath,
+            guint arg_passkey,
+            guint16 arg_entered);
 
-  gboolean (*handle_display_pin_code) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath,
-    const gchar *arg_pincode);
+    gboolean (*handle_display_pin_code)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath,
+            const gchar *arg_pincode);
 
-  gboolean (*handle_release) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+    gboolean (*handle_release)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation);
 
-  gboolean (*handle_request_authorization) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath);
+    gboolean (*handle_request_authorization)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath);
 
-  gboolean (*handle_request_confirmation) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_bjectpath,
-    guint arg_passkey);
+    gboolean (*handle_request_confirmation)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_bjectpath,
+            guint arg_passkey);
 
-  gboolean (*handle_request_passkey) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath);
+    gboolean (*handle_request_passkey)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath);
 
-  gboolean (*handle_request_pin_code) (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_objectpath);
+    gboolean (*handle_request_pin_code)(
+            PanoramaOrgBluezAgent1 *object,
+            GDBusMethodInvocation *invocation,
+            const gchar *arg_objectpath);
 
 };
 
-GType panorama_org_bluez_agent1_get_type (void) G_GNUC_CONST;
+GType panorama_org_bluez_agent1_get_type(void) G_GNUC_CONST;
 
-GDBusInterfaceInfo *panorama_org_bluez_agent1_interface_info (void);
-guint panorama_org_bluez_agent1_override_properties (GObjectClass *klass, guint property_id_begin);
+GDBusInterfaceInfo *panorama_org_bluez_agent1_interface_info(void);
+
+guint panorama_org_bluez_agent1_override_properties(GObjectClass *klass, guint property_id_begin);
 
 
 /* D-Bus method call completion functions: */
-void panorama_org_bluez_agent1_complete_release (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_release(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_request_pin_code (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *pincode);
+void panorama_org_bluez_agent1_complete_request_pin_code(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation,
+        const gchar *pincode);
 
-void panorama_org_bluez_agent1_complete_display_pin_code (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_display_pin_code(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_request_passkey (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    guint passkey);
+void panorama_org_bluez_agent1_complete_request_passkey(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation,
+        guint passkey);
 
-void panorama_org_bluez_agent1_complete_display_passkey (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_display_passkey(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_request_confirmation (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_request_confirmation(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_request_authorization (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_request_authorization(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_authorize_service (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
+void panorama_org_bluez_agent1_complete_authorize_service(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
-void panorama_org_bluez_agent1_complete_cancel (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation);
-
+void panorama_org_bluez_agent1_complete_cancel(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation);
 
 
 /* D-Bus method calls: */
-void panorama_org_bluez_agent1_call_release (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_release(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_release_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_release_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_release_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_release_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_request_pin_code (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_request_pin_code(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_request_pin_code_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    gchar **out_pincode,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_pin_code_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        gchar **out_pincode,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_request_pin_code_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    gchar **out_pincode,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_pin_code_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        gchar **out_pincode,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_display_pin_code (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_pincode,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_display_pin_code(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_pincode,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_display_pin_code_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_display_pin_code_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_display_pin_code_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_pincode,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_display_pin_code_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_pincode,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_request_passkey (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_request_passkey(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_request_passkey_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    guint *out_passkey,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_passkey_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        guint *out_passkey,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_request_passkey_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint *out_passkey,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_passkey_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint *out_passkey,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_display_passkey (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint arg_passkey,
-    guint16 arg_entered,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_display_passkey(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint arg_passkey,
+        guint16 arg_entered,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_display_passkey_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_display_passkey_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_display_passkey_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint arg_passkey,
-    guint16 arg_entered,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_display_passkey_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint arg_passkey,
+        guint16 arg_entered,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_request_confirmation (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_bjectpath,
-    guint arg_passkey,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_request_confirmation(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_bjectpath,
+        guint arg_passkey,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_request_confirmation_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_confirmation_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_request_confirmation_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_bjectpath,
-    guint arg_passkey,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_confirmation_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_bjectpath,
+        guint arg_passkey,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_request_authorization (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_request_authorization(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_request_authorization_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_authorization_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_request_authorization_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_request_authorization_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_authorize_service (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_uuid,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_authorize_service(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_uuid,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_authorize_service_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_authorize_service_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_authorize_service_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_uuid,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_authorize_service_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_uuid,
+        GCancellable *cancellable,
+        GError **error);
 
-void panorama_org_bluez_agent1_call_cancel (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
+void panorama_org_bluez_agent1_call_cancel(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-gboolean panorama_org_bluez_agent1_call_cancel_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_cancel_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error);
 
-gboolean panorama_org_bluez_agent1_call_cancel_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GError **error);
+gboolean panorama_org_bluez_agent1_call_cancel_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GError **error);
 
 
 
@@ -315,61 +318,63 @@ typedef struct _PanoramaOrgBluezAgent1Proxy PanoramaOrgBluezAgent1Proxy;
 typedef struct _PanoramaOrgBluezAgent1ProxyClass PanoramaOrgBluezAgent1ProxyClass;
 typedef struct _PanoramaOrgBluezAgent1ProxyPrivate PanoramaOrgBluezAgent1ProxyPrivate;
 
-struct _PanoramaOrgBluezAgent1Proxy
-{
-  /*< private >*/
-  GDBusProxy parent_instance;
-  PanoramaOrgBluezAgent1ProxyPrivate *priv;
+struct _PanoramaOrgBluezAgent1Proxy {
+    /*< private >*/
+    GDBusProxy parent_instance;
+    PanoramaOrgBluezAgent1ProxyPrivate *priv;
 };
 
-struct _PanoramaOrgBluezAgent1ProxyClass
-{
-  GDBusProxyClass parent_class;
+struct _PanoramaOrgBluezAgent1ProxyClass {
+    GDBusProxyClass parent_class;
 };
 
-GType panorama_org_bluez_agent1_proxy_get_type (void) G_GNUC_CONST;
+GType panorama_org_bluez_agent1_proxy_get_type(void) G_GNUC_CONST;
 
 #if GLIB_CHECK_VERSION(2, 44, 0)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (PanoramaOrgBluezAgent1Proxy, g_object_unref)
 #endif
 
-void panorama_org_bluez_agent1_proxy_new (
-    GDBusConnection     *connection,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GAsyncReadyCallback  callback,
-    gpointer             user_data);
-PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_finish (
-    GAsyncResult        *res,
-    GError             **error);
-PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_sync (
-    GDBusConnection     *connection,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GError             **error);
+void panorama_org_bluez_agent1_proxy_new(
+        GDBusConnection *connection,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-void panorama_org_bluez_agent1_proxy_new_for_bus (
-    GBusType             bus_type,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GAsyncReadyCallback  callback,
-    gpointer             user_data);
-PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_for_bus_finish (
-    GAsyncResult        *res,
-    GError             **error);
-PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_for_bus_sync (
-    GBusType             bus_type,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GError             **error);
+PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_finish(
+        GAsyncResult *res,
+        GError **error);
+
+PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_sync(
+        GDBusConnection *connection,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error);
+
+void panorama_org_bluez_agent1_proxy_new_for_bus(
+        GBusType bus_type,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
+
+PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_for_bus_finish(
+        GAsyncResult *res,
+        GError **error);
+
+PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_proxy_new_for_bus_sync(
+        GBusType bus_type,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error);
 
 
 /* ---- */
@@ -385,25 +390,23 @@ typedef struct _PanoramaOrgBluezAgent1Skeleton PanoramaOrgBluezAgent1Skeleton;
 typedef struct _PanoramaOrgBluezAgent1SkeletonClass PanoramaOrgBluezAgent1SkeletonClass;
 typedef struct _PanoramaOrgBluezAgent1SkeletonPrivate PanoramaOrgBluezAgent1SkeletonPrivate;
 
-struct _PanoramaOrgBluezAgent1Skeleton
-{
-  /*< private >*/
-  GDBusInterfaceSkeleton parent_instance;
-  PanoramaOrgBluezAgent1SkeletonPrivate *priv;
+struct _PanoramaOrgBluezAgent1Skeleton {
+    /*< private >*/
+    GDBusInterfaceSkeleton parent_instance;
+    PanoramaOrgBluezAgent1SkeletonPrivate *priv;
 };
 
-struct _PanoramaOrgBluezAgent1SkeletonClass
-{
-  GDBusInterfaceSkeletonClass parent_class;
+struct _PanoramaOrgBluezAgent1SkeletonClass {
+    GDBusInterfaceSkeletonClass parent_class;
 };
 
-GType panorama_org_bluez_agent1_skeleton_get_type (void) G_GNUC_CONST;
+GType panorama_org_bluez_agent1_skeleton_get_type(void) G_GNUC_CONST;
 
 #if GLIB_CHECK_VERSION(2, 44, 0)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (PanoramaOrgBluezAgent1Skeleton, g_object_unref)
 #endif
 
-PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_skeleton_new (void);
+PanoramaOrgBluezAgent1 *panorama_org_bluez_agent1_skeleton_new(void);
 
 
 /* ---- */
@@ -417,15 +420,15 @@ struct _PanoramaObject;
 typedef struct _PanoramaObject PanoramaObject;
 typedef struct _PanoramaObjectIface PanoramaObjectIface;
 
-struct _PanoramaObjectIface
-{
-  GTypeInterface parent_iface;
+struct _PanoramaObjectIface {
+    GTypeInterface parent_iface;
 };
 
-GType panorama_object_get_type (void) G_GNUC_CONST;
+GType panorama_object_get_type(void) G_GNUC_CONST;
 
-PanoramaOrgBluezAgent1 *panorama_object_get_org_bluez_agent1 (PanoramaObject *object);
-PanoramaOrgBluezAgent1 *panorama_object_peek_org_bluez_agent1 (PanoramaObject *object);
+PanoramaOrgBluezAgent1 *panorama_object_get_org_bluez_agent1(PanoramaObject *object);
+
+PanoramaOrgBluezAgent1 *panorama_object_peek_org_bluez_agent1(PanoramaObject *object);
 
 #define PANORAMA_TYPE_OBJECT_PROXY (panorama_object_proxy_get_type ())
 #define PANORAMA_OBJECT_PROXY(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), PANORAMA_TYPE_OBJECT_PROXY, PanoramaObjectProxy))
@@ -438,25 +441,23 @@ typedef struct _PanoramaObjectProxy PanoramaObjectProxy;
 typedef struct _PanoramaObjectProxyClass PanoramaObjectProxyClass;
 typedef struct _PanoramaObjectProxyPrivate PanoramaObjectProxyPrivate;
 
-struct _PanoramaObjectProxy
-{
-  /*< private >*/
-  GDBusObjectProxy parent_instance;
-  PanoramaObjectProxyPrivate *priv;
+struct _PanoramaObjectProxy {
+    /*< private >*/
+    GDBusObjectProxy parent_instance;
+    PanoramaObjectProxyPrivate *priv;
 };
 
-struct _PanoramaObjectProxyClass
-{
-  GDBusObjectProxyClass parent_class;
+struct _PanoramaObjectProxyClass {
+    GDBusObjectProxyClass parent_class;
 };
 
-GType panorama_object_proxy_get_type (void) G_GNUC_CONST;
+GType panorama_object_proxy_get_type(void) G_GNUC_CONST;
 
 #if GLIB_CHECK_VERSION(2, 44, 0)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (PanoramaObjectProxy, g_object_unref)
 #endif
 
-PanoramaObjectProxy *panorama_object_proxy_new (GDBusConnection *connection, const gchar *object_path);
+PanoramaObjectProxy *panorama_object_proxy_new(GDBusConnection *connection, const gchar *object_path);
 
 #define PANORAMA_TYPE_OBJECT_SKELETON (panorama_object_skeleton_get_type ())
 #define PANORAMA_OBJECT_SKELETON(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), PANORAMA_TYPE_OBJECT_SKELETON, PanoramaObjectSkeleton))
@@ -469,26 +470,25 @@ typedef struct _PanoramaObjectSkeleton PanoramaObjectSkeleton;
 typedef struct _PanoramaObjectSkeletonClass PanoramaObjectSkeletonClass;
 typedef struct _PanoramaObjectSkeletonPrivate PanoramaObjectSkeletonPrivate;
 
-struct _PanoramaObjectSkeleton
-{
-  /*< private >*/
-  GDBusObjectSkeleton parent_instance;
-  PanoramaObjectSkeletonPrivate *priv;
+struct _PanoramaObjectSkeleton {
+    /*< private >*/
+    GDBusObjectSkeleton parent_instance;
+    PanoramaObjectSkeletonPrivate *priv;
 };
 
-struct _PanoramaObjectSkeletonClass
-{
-  GDBusObjectSkeletonClass parent_class;
+struct _PanoramaObjectSkeletonClass {
+    GDBusObjectSkeletonClass parent_class;
 };
 
-GType panorama_object_skeleton_get_type (void) G_GNUC_CONST;
+GType panorama_object_skeleton_get_type(void) G_GNUC_CONST;
 
 #if GLIB_CHECK_VERSION(2, 44, 0)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (PanoramaObjectSkeleton, g_object_unref)
 #endif
 
-PanoramaObjectSkeleton *panorama_object_skeleton_new (const gchar *object_path);
-void panorama_object_skeleton_set_org_bluez_agent1 (PanoramaObjectSkeleton *object, PanoramaOrgBluezAgent1 *interface_);
+PanoramaObjectSkeleton *panorama_object_skeleton_new(const gchar *object_path);
+
+void panorama_object_skeleton_set_org_bluez_agent1(PanoramaObjectSkeleton *object, PanoramaOrgBluezAgent1 *interface_);
 
 /* ---- */
 
@@ -503,63 +503,66 @@ typedef struct _PanoramaObjectManagerClient PanoramaObjectManagerClient;
 typedef struct _PanoramaObjectManagerClientClass PanoramaObjectManagerClientClass;
 typedef struct _PanoramaObjectManagerClientPrivate PanoramaObjectManagerClientPrivate;
 
-struct _PanoramaObjectManagerClient
-{
-  /*< private >*/
-  GDBusObjectManagerClient parent_instance;
-  PanoramaObjectManagerClientPrivate *priv;
+struct _PanoramaObjectManagerClient {
+    /*< private >*/
+    GDBusObjectManagerClient parent_instance;
+    PanoramaObjectManagerClientPrivate *priv;
 };
 
-struct _PanoramaObjectManagerClientClass
-{
-  GDBusObjectManagerClientClass parent_class;
+struct _PanoramaObjectManagerClientClass {
+    GDBusObjectManagerClientClass parent_class;
 };
 
 #if GLIB_CHECK_VERSION(2, 44, 0)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (PanoramaObjectManagerClient, g_object_unref)
 #endif
 
-GType panorama_object_manager_client_get_type (void) G_GNUC_CONST;
+GType panorama_object_manager_client_get_type(void) G_GNUC_CONST;
 
-GType panorama_object_manager_client_get_proxy_type (GDBusObjectManagerClient *manager, const gchar *object_path, const gchar *interface_name, gpointer user_data);
+GType panorama_object_manager_client_get_proxy_type(GDBusObjectManagerClient *manager, const gchar *object_path,
+                                                    const gchar *interface_name, gpointer user_data);
 
-void panorama_object_manager_client_new (
-    GDBusConnection        *connection,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GAsyncReadyCallback     callback,
-    gpointer                user_data);
-GDBusObjectManager *panorama_object_manager_client_new_finish (
-    GAsyncResult        *res,
-    GError             **error);
-GDBusObjectManager *panorama_object_manager_client_new_sync (
-    GDBusConnection        *connection,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GError                **error);
+void panorama_object_manager_client_new(
+        GDBusConnection *connection,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
 
-void panorama_object_manager_client_new_for_bus (
-    GBusType                bus_type,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GAsyncReadyCallback     callback,
-    gpointer                user_data);
-GDBusObjectManager *panorama_object_manager_client_new_for_bus_finish (
-    GAsyncResult        *res,
-    GError             **error);
-GDBusObjectManager *panorama_object_manager_client_new_for_bus_sync (
-    GBusType                bus_type,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GError                **error);
+GDBusObjectManager *panorama_object_manager_client_new_finish(
+        GAsyncResult *res,
+        GError **error);
+
+GDBusObjectManager *panorama_object_manager_client_new_sync(
+        GDBusConnection *connection,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error);
+
+void panorama_object_manager_client_new_for_bus(
+        GBusType bus_type,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data);
+
+GDBusObjectManager *panorama_object_manager_client_new_for_bus_finish(
+        GAsyncResult *res,
+        GError **error);
+
+GDBusObjectManager *panorama_object_manager_client_new_for_bus_sync(
+        GBusType bus_type,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error);
 
 
 G_END_DECLS

@@ -2,18 +2,18 @@
         "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
     <interface name="org.bluez.Agent1">
-        <method name="Release" />
+        <method name="Release"/>
         <method name="RequestPinCode">
-            <arg direction="in" type="o" name="objectpath" />
-            <arg direction="out" type="s" name="pincode" />
+            <arg direction="in" type="o" name="objectpath"/>
+            <arg direction="out" type="s" name="pincode"/>
         </method>
         <method name="DisplayPinCode">
-            <arg direction="in" type="o" name="objectpath" />
+            <arg direction="in" type="o" name="objectpath"/>
             <arg direction="in" type="s" name="pincode"/>
         </method>
         <method name="RequestPasskey">
-            <arg direction="in" type="o" name="objectpath" />
-            <arg direction="out" type="u" name="passkey" />
+            <arg direction="in" type="o" name="objectpath"/>
+            <arg direction="out" type="u" name="passkey"/>
         </method>
         <method name="DisplayPasskey">
             <arg direction="in" type="o" name="objectpath"/>
@@ -31,18 +31,17 @@
             <arg direction="in" type="o" name="objectpath"/>
             <arg direction="in" type="s" name="uuid"/>
         </method>
-        <method name="Cancel" />
+        <method name="Cancel"/>
     </interface>
 </node>
 
+        <?ignore
+                ## This command is used to generate the files required to build a service
 
-<?ignore
-    ## This command is used to generate the files required to build a service
-
-    gdbus-codegen --interface-prefix com.panoramalabs.     \
-    --generate-c-code panoramalabs-service                 \
-    --c-namespace Panorama                                 \
-    --c-generate-object-manager                            \
-    --generate-docbook panoramalabs-service-generated-docs \
-    panoramalabs-service.xml                               \
-?>
+                gdbus-codegen --interface-prefix com.panoramalabs.     \
+                --generate-c-code panoramalabs-service                 \
+                --c-namespace Panorama                                 \
+                --c-generate-object-manager                            \
+                --generate-docbook panoramalabs-service-generated-docs \
+                panoramalabs-service.xml                               \
+                ?>

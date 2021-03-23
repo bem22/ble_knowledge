@@ -13,142 +13,131 @@
 #include "panoramalabs-service.h"
 
 #include <string.h>
+
 #ifdef G_OS_UNIX
+
 #  include <gio/gunixfdlist.h>
+
 #endif
 
-typedef struct
-{
-  GDBusArgInfo parent_struct;
-  gboolean use_gvariant;
+typedef struct {
+    GDBusArgInfo parent_struct;
+    gboolean use_gvariant;
 } _ExtendedGDBusArgInfo;
 
-typedef struct
-{
-  GDBusMethodInfo parent_struct;
-  const gchar *signal_name;
-  gboolean pass_fdlist;
+typedef struct {
+    GDBusMethodInfo parent_struct;
+    const gchar *signal_name;
+    gboolean pass_fdlist;
 } _ExtendedGDBusMethodInfo;
 
-typedef struct
-{
-  GDBusSignalInfo parent_struct;
-  const gchar *signal_name;
+typedef struct {
+    GDBusSignalInfo parent_struct;
+    const gchar *signal_name;
 } _ExtendedGDBusSignalInfo;
 
-typedef struct
-{
-  GDBusPropertyInfo parent_struct;
-  const gchar *hyphen_name;
-  guint use_gvariant : 1;
-  guint emits_changed_signal : 1;
+typedef struct {
+    GDBusPropertyInfo parent_struct;
+    const gchar *hyphen_name;
+    guint use_gvariant: 1;
+    guint emits_changed_signal: 1;
 } _ExtendedGDBusPropertyInfo;
 
-typedef struct
-{
-  GDBusInterfaceInfo parent_struct;
-  const gchar *hyphen_name;
+typedef struct {
+    GDBusInterfaceInfo parent_struct;
+    const gchar *hyphen_name;
 } _ExtendedGDBusInterfaceInfo;
 
-typedef struct
-{
-  const _ExtendedGDBusPropertyInfo *info;
-  guint prop_id;
-  GValue orig_value; /* the value before the change */
+typedef struct {
+    const _ExtendedGDBusPropertyInfo *info;
+    guint prop_id;
+    GValue orig_value; /* the value before the change */
 } ChangedProperty;
 
 static void
-_changed_property_free (ChangedProperty *data)
-{
-  g_value_unset (&data->orig_value);
-  g_free (data);
+_changed_property_free(ChangedProperty *data) {
+    g_value_unset(&data->orig_value);
+    g_free(data);
 }
 
 static gboolean
-_g_strv_equal0 (gchar **a, gchar **b)
-{
-  gboolean ret = FALSE;
-  guint n;
-  if (a == NULL && b == NULL)
-    {
-      ret = TRUE;
-      goto out;
+_g_strv_equal0(gchar **a, gchar **b) {
+    gboolean ret = FALSE;
+    guint n;
+    if (a == NULL && b == NULL) {
+        ret = TRUE;
+        goto out;
     }
-  if (a == NULL || b == NULL)
-    goto out;
-  if (g_strv_length (a) != g_strv_length (b))
-    goto out;
-  for (n = 0; a[n] != NULL; n++)
-    if (g_strcmp0 (a[n], b[n]) != 0)
-      goto out;
-  ret = TRUE;
-out:
-  return ret;
+    if (a == NULL || b == NULL)
+        goto out;
+    if (g_strv_length(a) != g_strv_length(b))
+        goto out;
+    for (n = 0; a[n] != NULL; n++)
+        if (g_strcmp0(a[n], b[n]) != 0)
+            goto out;
+    ret = TRUE;
+    out:
+    return ret;
 }
 
 static gboolean
-_g_variant_equal0 (GVariant *a, GVariant *b)
-{
-  gboolean ret = FALSE;
-  if (a == NULL && b == NULL)
-    {
-      ret = TRUE;
-      goto out;
+_g_variant_equal0(GVariant *a, GVariant *b) {
+    gboolean ret = FALSE;
+    if (a == NULL && b == NULL) {
+        ret = TRUE;
+        goto out;
     }
-  if (a == NULL || b == NULL)
-    goto out;
-  ret = g_variant_equal (a, b);
-out:
-  return ret;
+    if (a == NULL || b == NULL)
+        goto out;
+    ret = g_variant_equal(a, b);
+    out:
+    return ret;
 }
 
 G_GNUC_UNUSED static gboolean
-_g_value_equal (const GValue *a, const GValue *b)
-{
-  gboolean ret = FALSE;
-  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));
-  switch (G_VALUE_TYPE (a))
-    {
-      case G_TYPE_BOOLEAN:
-        ret = (g_value_get_boolean (a) == g_value_get_boolean (b));
-        break;
-      case G_TYPE_UCHAR:
-        ret = (g_value_get_uchar (a) == g_value_get_uchar (b));
-        break;
-      case G_TYPE_INT:
-        ret = (g_value_get_int (a) == g_value_get_int (b));
-        break;
-      case G_TYPE_UINT:
-        ret = (g_value_get_uint (a) == g_value_get_uint (b));
-        break;
-      case G_TYPE_INT64:
-        ret = (g_value_get_int64 (a) == g_value_get_int64 (b));
-        break;
-      case G_TYPE_UINT64:
-        ret = (g_value_get_uint64 (a) == g_value_get_uint64 (b));
-        break;
-      case G_TYPE_DOUBLE:
-        {
-          /* Avoid -Wfloat-equal warnings by doing a direct bit compare */
-          gdouble da = g_value_get_double (a);
-          gdouble db = g_value_get_double (b);
-          ret = memcmp (&da, &db, sizeof (gdouble)) == 0;
+_g_value_equal(const GValue *a, const GValue *b) {
+    gboolean ret = FALSE;
+    g_assert (G_VALUE_TYPE(a) == G_VALUE_TYPE(b));
+    switch (G_VALUE_TYPE (a)) {
+        case G_TYPE_BOOLEAN:
+            ret = (g_value_get_boolean(a) == g_value_get_boolean(b));
+            break;
+        case G_TYPE_UCHAR:
+            ret = (g_value_get_uchar(a) == g_value_get_uchar(b));
+            break;
+        case G_TYPE_INT:
+            ret = (g_value_get_int(a) == g_value_get_int(b));
+            break;
+        case G_TYPE_UINT:
+            ret = (g_value_get_uint(a) == g_value_get_uint(b));
+            break;
+        case G_TYPE_INT64:
+            ret = (g_value_get_int64(a) == g_value_get_int64(b));
+            break;
+        case G_TYPE_UINT64:
+            ret = (g_value_get_uint64(a) == g_value_get_uint64(b));
+            break;
+        case G_TYPE_DOUBLE: {
+            /* Avoid -Wfloat-equal warnings by doing a direct bit compare */
+            gdouble da = g_value_get_double(a);
+            gdouble db = g_value_get_double(b);
+            ret = memcmp(&da, &db, sizeof(gdouble)) == 0;
         }
-        break;
-      case G_TYPE_STRING:
-        ret = (g_strcmp0 (g_value_get_string (a), g_value_get_string (b)) == 0);
-        break;
-      case G_TYPE_VARIANT:
-        ret = _g_variant_equal0 (g_value_get_variant (a), g_value_get_variant (b));
-        break;
-      default:
-        if (G_VALUE_TYPE (a) == G_TYPE_STRV)
-          ret = _g_strv_equal0 (g_value_get_boxed (a), g_value_get_boxed (b));
-        else
-          g_critical ("_g_value_equal() does not handle type %s", g_type_name (G_VALUE_TYPE (a)));
-        break;
+            break;
+        case G_TYPE_STRING:
+            ret = (g_strcmp0(g_value_get_string(a), g_value_get_string(b)) == 0);
+            break;
+        case G_TYPE_VARIANT:
+            ret = _g_variant_equal0(g_value_get_variant(a), g_value_get_variant(b));
+            break;
+        default:
+            if (G_VALUE_TYPE (a) == G_TYPE_STRV)
+                ret = _g_strv_equal0(g_value_get_boxed(a), g_value_get_boxed(b));
+            else
+                g_critical ("_g_value_equal() does not handle type %s", g_type_name(G_VALUE_TYPE(a)));
+            break;
     }
-  return ret;
+    return ret;
 }
 
 /* ------------------------------------------------------------------------
@@ -167,361 +156,361 @@ _g_value_equal (const GValue *a, const GValue *b)
 /* ---- Introspection data for org.bluez.Agent1 ---- */
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_release =
-{
-  {
-    -1,
-    (gchar *) "Release",
-    NULL,
-    NULL,
-    NULL
-  },
-  "handle-release",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "Release",
+                        NULL,
+                        NULL,
+                        NULL
+                },
+                "handle-release",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_objectpath.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_objectpath.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pincode =
-{
-  {
-    -1,
-    (gchar *) "pincode",
-    (gchar *) "s",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "pincode",
+                        (gchar *) "s",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pincode.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pincode.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_request_pin_code =
-{
-  {
-    -1,
-    (gchar *) "RequestPinCode",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_pointers,
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pointers,
-    NULL
-  },
-  "handle-request-pin-code",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "RequestPinCode",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_pin_code_IN_ARG_pointers,
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_pin_code_OUT_ARG_pointers,
+                        NULL
+                },
+                "handle-request-pin-code",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pincode =
-{
-  {
-    -1,
-    (gchar *) "pincode",
-    (gchar *) "s",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "pincode",
+                        (gchar *) "s",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_objectpath.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pincode.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_objectpath.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pincode.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_display_pin_code =
-{
-  {
-    -1,
-    (gchar *) "DisplayPinCode",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-display-pin-code",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "DisplayPinCode",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_display_pin_code_IN_ARG_pointers,
+                        NULL,
+                        NULL
+                },
+                "handle-display-pin-code",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_objectpath.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_objectpath.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_passkey =
-{
-  {
-    -1,
-    (gchar *) "passkey",
-    (gchar *) "u",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "passkey",
+                        (gchar *) "u",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_passkey.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_passkey.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_request_passkey =
-{
-  {
-    -1,
-    (gchar *) "RequestPasskey",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_pointers,
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_pointers,
-    NULL
-  },
-  "handle-request-passkey",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "RequestPasskey",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_passkey_IN_ARG_pointers,
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_passkey_OUT_ARG_pointers,
+                        NULL
+                },
+                "handle-request-passkey",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_passkey =
-{
-  {
-    -1,
-    (gchar *) "passkey",
-    (gchar *) "u",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "passkey",
+                        (gchar *) "u",
+                        NULL
+                },
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_entered =
-{
-  {
-    -1,
-    (gchar *) "entered",
-    (gchar *) "q",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "entered",
+                        (gchar *) "q",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_objectpath.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_passkey.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_entered.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_objectpath.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_passkey.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_entered.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_display_passkey =
-{
-  {
-    -1,
-    (gchar *) "DisplayPasskey",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-display-passkey",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "DisplayPasskey",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_display_passkey_IN_ARG_pointers,
+                        NULL,
+                        NULL
+                },
+                "handle-display-passkey",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_bjectpath =
-{
-  {
-    -1,
-    (gchar *) "bjectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "bjectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_passkey =
-{
-  {
-    -1,
-    (gchar *) "passkey",
-    (gchar *) "u",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "passkey",
+                        (gchar *) "u",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_bjectpath.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_passkey.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_bjectpath.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_passkey.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_request_confirmation =
-{
-  {
-    -1,
-    (gchar *) "RequestConfirmation",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-request-confirmation",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "RequestConfirmation",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_confirmation_IN_ARG_pointers,
+                        NULL,
+                        NULL
+                },
+                "handle-request-confirmation",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_objectpath.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_objectpath.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_request_authorization =
-{
-  {
-    -1,
-    (gchar *) "RequestAuthorization",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-request-authorization",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "RequestAuthorization",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_request_authorization_IN_ARG_pointers,
+                        NULL,
+                        NULL
+                },
+                "handle-request-authorization",
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_objectpath =
-{
-  {
-    -1,
-    (gchar *) "objectpath",
-    (gchar *) "o",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "objectpath",
+                        (gchar *) "o",
+                        NULL
+                },
+                FALSE
+        };
 
 static const _ExtendedGDBusArgInfo _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_uuid =
-{
-  {
-    -1,
-    (gchar *) "uuid",
-    (gchar *) "s",
-    NULL
-  },
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "uuid",
+                        (gchar *) "s",
+                        NULL
+                },
+                FALSE
+        };
 
-static const GDBusArgInfo * const _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_objectpath.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_uuid.parent_struct,
-  NULL
-};
+static const GDBusArgInfo *const _panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_objectpath.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_uuid.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_authorize_service =
-{
-  {
-    -1,
-    (gchar *) "AuthorizeService",
-    (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-authorize-service",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "AuthorizeService",
+                        (GDBusArgInfo **) &_panorama_org_bluez_agent1_method_info_authorize_service_IN_ARG_pointers,
+                        NULL,
+                        NULL
+                },
+                "handle-authorize-service",
+                FALSE
+        };
 
 static const _ExtendedGDBusMethodInfo _panorama_org_bluez_agent1_method_info_cancel =
-{
-  {
-    -1,
-    (gchar *) "Cancel",
-    NULL,
-    NULL,
-    NULL
-  },
-  "handle-cancel",
-  FALSE
-};
+        {
+                {
+                        -1,
+                        (gchar *) "Cancel",
+                        NULL,
+                        NULL,
+                        NULL
+                },
+                "handle-cancel",
+                FALSE
+        };
 
-static const GDBusMethodInfo * const _panorama_org_bluez_agent1_method_info_pointers[] =
-{
-  &_panorama_org_bluez_agent1_method_info_release.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_pin_code.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_pin_code.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_passkey.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_display_passkey.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_confirmation.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_request_authorization.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_authorize_service.parent_struct,
-  &_panorama_org_bluez_agent1_method_info_cancel.parent_struct,
-  NULL
-};
+static const GDBusMethodInfo *const _panorama_org_bluez_agent1_method_info_pointers[] =
+        {
+                &_panorama_org_bluez_agent1_method_info_release.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_request_pin_code.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_display_pin_code.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_request_passkey.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_display_passkey.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_request_confirmation.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_request_authorization.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_authorize_service.parent_struct,
+                &_panorama_org_bluez_agent1_method_info_cancel.parent_struct,
+                NULL
+        };
 
 static const _ExtendedGDBusInterfaceInfo _panorama_org_bluez_agent1_interface_info =
-{
-  {
-    -1,
-    (gchar *) "org.bluez.Agent1",
-    (GDBusMethodInfo **) &_panorama_org_bluez_agent1_method_info_pointers,
-    NULL,
-    NULL,
-    NULL
-  },
-  "org-bluez-agent1",
-};
+        {
+                {
+                        -1,
+                        (gchar *) "org.bluez.Agent1",
+                        (GDBusMethodInfo **) &_panorama_org_bluez_agent1_method_info_pointers,
+                        NULL,
+                        NULL,
+                        NULL
+                },
+                "org-bluez-agent1",
+        };
 
 
 /**
@@ -532,9 +521,8 @@ static const _ExtendedGDBusInterfaceInfo _panorama_org_bluez_agent1_interface_in
  * Returns: (transfer none): A #GDBusInterfaceInfo. Do not free.
  */
 GDBusInterfaceInfo *
-panorama_org_bluez_agent1_interface_info (void)
-{
-  return (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct;
+panorama_org_bluez_agent1_interface_info(void) {
+    return (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct;
 }
 
 /**
@@ -548,9 +536,8 @@ panorama_org_bluez_agent1_interface_info (void)
  * Returns: The last property id.
  */
 guint
-panorama_org_bluez_agent1_override_properties (GObjectClass *klass, guint property_id_begin)
-{
-  return property_id_begin - 1;
+panorama_org_bluez_agent1_override_properties(GObjectClass *klass, guint property_id_begin) {
+    return property_id_begin - 1;
 }
 
 
@@ -578,221 +565,221 @@ panorama_org_bluez_agent1_override_properties (GObjectClass *klass, guint proper
  */
 
 typedef PanoramaOrgBluezAgent1Iface PanoramaOrgBluezAgent1Interface;
+
 G_DEFINE_INTERFACE (PanoramaOrgBluezAgent1, panorama_org_bluez_agent1, G_TYPE_OBJECT)
 
 static void
-panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
-{
-  /* GObject signals for incoming D-Bus method calls: */
-  /**
-   * PanoramaOrgBluezAgent1::handle-release:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.Release">Release()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_release() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-release",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_release),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    1,
-    G_TYPE_DBUS_METHOD_INVOCATION);
+panorama_org_bluez_agent1_default_init(PanoramaOrgBluezAgent1Iface *iface) {
+    /* GObject signals for incoming D-Bus method calls: */
+    /**
+     * PanoramaOrgBluezAgent1::handle-release:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.Release">Release()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_release() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-release",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_release),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 1,
+                 G_TYPE_DBUS_METHOD_INVOCATION);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-request-pin-code:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_pin_code() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-request-pin-code",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_pin_code),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    2,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
+    /**
+     * PanoramaOrgBluezAgent1::handle-request-pin-code:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_pin_code() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-request-pin-code",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_pin_code),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 2,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-display-pin-code:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   * @arg_pincode: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_display_pin_code() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-display-pin-code",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_display_pin_code),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    3,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_STRING);
+    /**
+     * PanoramaOrgBluezAgent1::handle-display-pin-code:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     * @arg_pincode: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_display_pin_code() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-display-pin-code",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_display_pin_code),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 3,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_STRING);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-request-passkey:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_passkey() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-request-passkey",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_passkey),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    2,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
+    /**
+     * PanoramaOrgBluezAgent1::handle-request-passkey:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_passkey() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-request-passkey",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_passkey),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 2,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-display-passkey:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   * @arg_passkey: Argument passed by remote caller.
-   * @arg_entered: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_display_passkey() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-display-passkey",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_display_passkey),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    4,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT);
+    /**
+     * PanoramaOrgBluezAgent1::handle-display-passkey:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     * @arg_passkey: Argument passed by remote caller.
+     * @arg_entered: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_display_passkey() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-display-passkey",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_display_passkey),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 4,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_UINT, G_TYPE_UINT);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-request-confirmation:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_bjectpath: Argument passed by remote caller.
-   * @arg_passkey: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_confirmation() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-request-confirmation",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_confirmation),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    3,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_UINT);
+    /**
+     * PanoramaOrgBluezAgent1::handle-request-confirmation:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_bjectpath: Argument passed by remote caller.
+     * @arg_passkey: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_confirmation() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-request-confirmation",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_confirmation),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 3,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_UINT);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-request-authorization:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_authorization() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-request-authorization",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_authorization),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    2,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
+    /**
+     * PanoramaOrgBluezAgent1::handle-request-authorization:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_request_authorization() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-request-authorization",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_request_authorization),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 2,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-authorize-service:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_objectpath: Argument passed by remote caller.
-   * @arg_uuid: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_authorize_service() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-authorize-service",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_authorize_service),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    3,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_STRING);
+    /**
+     * PanoramaOrgBluezAgent1::handle-authorize-service:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     * @arg_objectpath: Argument passed by remote caller.
+     * @arg_uuid: Argument passed by remote caller.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_authorize_service() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-authorize-service",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_authorize_service),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 3,
+                 G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_STRING);
 
-  /**
-   * PanoramaOrgBluezAgent1::handle-cancel:
-   * @object: A #PanoramaOrgBluezAgent1.
-   * @invocation: A #GDBusMethodInvocation.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.Cancel">Cancel()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_cancel() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-cancel",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_cancel),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    1,
-    G_TYPE_DBUS_METHOD_INVOCATION);
+    /**
+     * PanoramaOrgBluezAgent1::handle-cancel:
+     * @object: A #PanoramaOrgBluezAgent1.
+     * @invocation: A #GDBusMethodInvocation.
+     *
+     * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-bluez-Agent1.Cancel">Cancel()</link> D-Bus method.
+     *
+     * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call panorama_org_bluez_agent1_complete_cancel() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
+     *
+     * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
+     */
+    g_signal_new("handle-cancel",
+                 G_TYPE_FROM_INTERFACE (iface),
+                 G_SIGNAL_RUN_LAST,
+                 G_STRUCT_OFFSET (PanoramaOrgBluezAgent1Iface, handle_cancel),
+                 g_signal_accumulator_true_handled,
+                 NULL,
+                 g_cclosure_marshal_generic,
+                 G_TYPE_BOOLEAN,
+                 1,
+                 G_TYPE_DBUS_METHOD_INVOCATION);
 
 }
 
@@ -810,20 +797,19 @@ panorama_org_bluez_agent1_default_init (PanoramaOrgBluezAgent1Iface *iface)
  * See panorama_org_bluez_agent1_call_release_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_release (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "Release",
-    g_variant_new ("()"),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_release(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "Release",
+                      g_variant_new("()"),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -837,20 +823,19 @@ panorama_org_bluez_agent1_call_release (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_release_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_release_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -866,26 +851,25 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_release_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "Release",
-    g_variant_new ("()"),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_release_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "Release",
+                                  g_variant_new("()"),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -903,22 +887,21 @@ _out:
  * See panorama_org_bluez_agent1_call_request_pin_code_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_request_pin_code (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "RequestPinCode",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_request_pin_code(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "RequestPinCode",
+                      g_variant_new("(o)",
+                                    arg_objectpath),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -933,22 +916,21 @@ panorama_org_bluez_agent1_call_request_pin_code (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_pin_code_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    gchar **out_pincode,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "(s)",
-                 out_pincode);
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_pin_code_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        gchar **out_pincode,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "(s)",
+                  out_pincode);
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -966,30 +948,29 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_pin_code_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    gchar **out_pincode,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "RequestPinCode",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "(s)",
-                 out_pincode);
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_pin_code_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        gchar **out_pincode,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "RequestPinCode",
+                                  g_variant_new("(o)",
+                                                arg_objectpath),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "(s)",
+                  out_pincode);
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1008,24 +989,23 @@ _out:
  * See panorama_org_bluez_agent1_call_display_pin_code_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_display_pin_code (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_pincode,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "DisplayPinCode",
-    g_variant_new ("(os)",
-                   arg_objectpath,
-                   arg_pincode),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_display_pin_code(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_pincode,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "DisplayPinCode",
+                      g_variant_new("(os)",
+                                    arg_objectpath,
+                                    arg_pincode),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1039,20 +1019,19 @@ panorama_org_bluez_agent1_call_display_pin_code (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_display_pin_code_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_display_pin_code_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1070,30 +1049,29 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_display_pin_code_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_pincode,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "DisplayPinCode",
-    g_variant_new ("(os)",
-                   arg_objectpath,
-                   arg_pincode),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_display_pin_code_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_pincode,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "DisplayPinCode",
+                                  g_variant_new("(os)",
+                                                arg_objectpath,
+                                                arg_pincode),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1111,22 +1089,21 @@ _out:
  * See panorama_org_bluez_agent1_call_request_passkey_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_request_passkey (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "RequestPasskey",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_request_passkey(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "RequestPasskey",
+                      g_variant_new("(o)",
+                                    arg_objectpath),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1141,22 +1118,21 @@ panorama_org_bluez_agent1_call_request_passkey (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_passkey_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    guint *out_passkey,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "(u)",
-                 out_passkey);
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_passkey_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        guint *out_passkey,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "(u)",
+                  out_passkey);
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1174,30 +1150,29 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_passkey_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint *out_passkey,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "RequestPasskey",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "(u)",
-                 out_passkey);
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_passkey_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint *out_passkey,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "RequestPasskey",
+                                  g_variant_new("(o)",
+                                                arg_objectpath),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "(u)",
+                  out_passkey);
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1217,26 +1192,25 @@ _out:
  * See panorama_org_bluez_agent1_call_display_passkey_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_display_passkey (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint arg_passkey,
-    guint16 arg_entered,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "DisplayPasskey",
-    g_variant_new ("(ouq)",
-                   arg_objectpath,
-                   arg_passkey,
-                   arg_entered),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_display_passkey(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint arg_passkey,
+        guint16 arg_entered,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "DisplayPasskey",
+                      g_variant_new("(ouq)",
+                                    arg_objectpath,
+                                    arg_passkey,
+                                    arg_entered),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1250,20 +1224,19 @@ panorama_org_bluez_agent1_call_display_passkey (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_display_passkey_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_display_passkey_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1282,32 +1255,31 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_display_passkey_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    guint arg_passkey,
-    guint16 arg_entered,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "DisplayPasskey",
-    g_variant_new ("(ouq)",
-                   arg_objectpath,
-                   arg_passkey,
-                   arg_entered),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_display_passkey_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        guint arg_passkey,
+        guint16 arg_entered,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "DisplayPasskey",
+                                  g_variant_new("(ouq)",
+                                                arg_objectpath,
+                                                arg_passkey,
+                                                arg_entered),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1326,24 +1298,23 @@ _out:
  * See panorama_org_bluez_agent1_call_request_confirmation_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_request_confirmation (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_bjectpath,
-    guint arg_passkey,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "RequestConfirmation",
-    g_variant_new ("(ou)",
-                   arg_bjectpath,
-                   arg_passkey),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_request_confirmation(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_bjectpath,
+        guint arg_passkey,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "RequestConfirmation",
+                      g_variant_new("(ou)",
+                                    arg_bjectpath,
+                                    arg_passkey),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1357,20 +1328,19 @@ panorama_org_bluez_agent1_call_request_confirmation (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_confirmation_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_confirmation_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1388,30 +1358,29 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_confirmation_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_bjectpath,
-    guint arg_passkey,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "RequestConfirmation",
-    g_variant_new ("(ou)",
-                   arg_bjectpath,
-                   arg_passkey),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_confirmation_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_bjectpath,
+        guint arg_passkey,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "RequestConfirmation",
+                                  g_variant_new("(ou)",
+                                                arg_bjectpath,
+                                                arg_passkey),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1429,22 +1398,21 @@ _out:
  * See panorama_org_bluez_agent1_call_request_authorization_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_request_authorization (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "RequestAuthorization",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_request_authorization(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "RequestAuthorization",
+                      g_variant_new("(o)",
+                                    arg_objectpath),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1458,20 +1426,19 @@ panorama_org_bluez_agent1_call_request_authorization (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_authorization_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_authorization_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1488,28 +1455,27 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_request_authorization_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "RequestAuthorization",
-    g_variant_new ("(o)",
-                   arg_objectpath),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_request_authorization_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "RequestAuthorization",
+                                  g_variant_new("(o)",
+                                                arg_objectpath),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1528,24 +1494,23 @@ _out:
  * See panorama_org_bluez_agent1_call_authorize_service_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_authorize_service (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_uuid,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "AuthorizeService",
-    g_variant_new ("(os)",
-                   arg_objectpath,
-                   arg_uuid),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_authorize_service(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_uuid,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "AuthorizeService",
+                      g_variant_new("(os)",
+                                    arg_objectpath,
+                                    arg_uuid),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1559,20 +1524,19 @@ panorama_org_bluez_agent1_call_authorize_service (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_authorize_service_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_authorize_service_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1590,30 +1554,29 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_authorize_service_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    const gchar *arg_objectpath,
-    const gchar *arg_uuid,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "AuthorizeService",
-    g_variant_new ("(os)",
-                   arg_objectpath,
-                   arg_uuid),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_authorize_service_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        const gchar *arg_objectpath,
+        const gchar *arg_uuid,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "AuthorizeService",
+                                  g_variant_new("(os)",
+                                                arg_objectpath,
+                                                arg_uuid),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1630,20 +1593,19 @@ _out:
  * See panorama_org_bluez_agent1_call_cancel_sync() for the synchronous, blocking version of this method.
  */
 void
-panorama_org_bluez_agent1_call_cancel (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "Cancel",
-    g_variant_new ("()"),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
+panorama_org_bluez_agent1_call_cancel(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_dbus_proxy_call(G_DBUS_PROXY (proxy),
+                      "Cancel",
+                      g_variant_new("()"),
+                      G_DBUS_CALL_FLAGS_NONE,
+                      -1,
+                      cancellable,
+                      callback,
+                      user_data);
 }
 
 /**
@@ -1657,20 +1619,19 @@ panorama_org_bluez_agent1_call_cancel (
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_cancel_finish (
-    PanoramaOrgBluezAgent1 *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_cancel_finish(
+        PanoramaOrgBluezAgent1 *proxy,
+        GAsyncResult *res,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_finish(G_DBUS_PROXY (proxy), res, error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1686,26 +1647,25 @@ _out:
  * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
  */
 gboolean
-panorama_org_bluez_agent1_call_cancel_sync (
-    PanoramaOrgBluezAgent1 *proxy,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "Cancel",
-    g_variant_new ("()"),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
+panorama_org_bluez_agent1_call_cancel_sync(
+        PanoramaOrgBluezAgent1 *proxy,
+        GCancellable *cancellable,
+        GError **error) {
+    GVariant *_ret;
+    _ret = g_dbus_proxy_call_sync(G_DBUS_PROXY (proxy),
+                                  "Cancel",
+                                  g_variant_new("()"),
+                                  G_DBUS_CALL_FLAGS_NONE,
+                                  -1,
+                                  cancellable,
+                                  error);
+    if (_ret == NULL)
+        goto _out;
+    g_variant_get(_ret,
+                  "()");
+    g_variant_unref(_ret);
+    _out:
+    return _ret != NULL;
 }
 
 /**
@@ -1718,12 +1678,11 @@ _out:
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_release (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_release(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1737,14 +1696,13 @@ panorama_org_bluez_agent1_complete_release (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_request_pin_code (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *pincode)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(s)",
-                   pincode));
+panorama_org_bluez_agent1_complete_request_pin_code(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation,
+        const gchar *pincode) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("(s)",
+                                                        pincode));
 }
 
 /**
@@ -1757,12 +1715,11 @@ panorama_org_bluez_agent1_complete_request_pin_code (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_display_pin_code (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_display_pin_code(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1776,14 +1733,13 @@ panorama_org_bluez_agent1_complete_display_pin_code (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_request_passkey (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation,
-    guint passkey)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(u)",
-                   passkey));
+panorama_org_bluez_agent1_complete_request_passkey(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation,
+        guint passkey) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("(u)",
+                                                        passkey));
 }
 
 /**
@@ -1796,12 +1752,11 @@ panorama_org_bluez_agent1_complete_request_passkey (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_display_passkey (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_display_passkey(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1814,12 +1769,11 @@ panorama_org_bluez_agent1_complete_display_passkey (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_request_confirmation (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_request_confirmation(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1832,12 +1786,11 @@ panorama_org_bluez_agent1_complete_request_confirmation (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_request_authorization (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_request_authorization(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1850,12 +1803,11 @@ panorama_org_bluez_agent1_complete_request_authorization (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_authorize_service (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_authorize_service(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /**
@@ -1868,12 +1820,11 @@ panorama_org_bluez_agent1_complete_authorize_service (
  * This method will free @invocation, you cannot use it afterwards.
  */
 void
-panorama_org_bluez_agent1_complete_cancel (
-    PanoramaOrgBluezAgent1 *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+panorama_org_bluez_agent1_complete_cancel(
+        PanoramaOrgBluezAgent1 *object,
+        GDBusMethodInvocation *invocation) {
+    g_dbus_method_invocation_return_value(invocation,
+                                          g_variant_new("()"));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1891,152 +1842,145 @@ panorama_org_bluez_agent1_complete_cancel (
  * Class structure for #PanoramaOrgBluezAgent1Proxy.
  */
 
-struct _PanoramaOrgBluezAgent1ProxyPrivate
-{
-  GData *qdata;
+struct _PanoramaOrgBluezAgent1ProxyPrivate {
+    GData *qdata;
 };
 
-static void panorama_org_bluez_agent1_proxy_iface_init (PanoramaOrgBluezAgent1Iface *iface);
+static void panorama_org_bluez_agent1_proxy_iface_init(PanoramaOrgBluezAgent1Iface *iface);
 
 #if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38
+
 G_DEFINE_TYPE_WITH_CODE (PanoramaOrgBluezAgent1Proxy, panorama_org_bluez_agent1_proxy, G_TYPE_DBUS_PROXY,
-                         G_ADD_PRIVATE (PanoramaOrgBluezAgent1Proxy)
-                         G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_ORG_BLUEZ_AGENT1, panorama_org_bluez_agent1_proxy_iface_init))
+                         G_ADD_PRIVATE(PanoramaOrgBluezAgent1Proxy)
+                                 G_IMPLEMENT_INTERFACE(PANORAMA_TYPE_ORG_BLUEZ_AGENT1,
+                                                       panorama_org_bluez_agent1_proxy_iface_init))
 
 #else
 G_DEFINE_TYPE_WITH_CODE (PanoramaOrgBluezAgent1Proxy, panorama_org_bluez_agent1_proxy, G_TYPE_DBUS_PROXY,
                          G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_ORG_BLUEZ_AGENT1, panorama_org_bluez_agent1_proxy_iface_init))
 
 #endif
+
 static void
-panorama_org_bluez_agent1_proxy_finalize (GObject *object)
-{
-  PanoramaOrgBluezAgent1Proxy *proxy = PANORAMA_ORG_BLUEZ_AGENT1_PROXY (object);
-  g_datalist_clear (&proxy->priv->qdata);
-  G_OBJECT_CLASS (panorama_org_bluez_agent1_proxy_parent_class)->finalize (object);
+panorama_org_bluez_agent1_proxy_finalize(GObject *object) {
+    PanoramaOrgBluezAgent1Proxy *proxy = PANORAMA_ORG_BLUEZ_AGENT1_PROXY (object);
+    g_datalist_clear(&proxy->priv->qdata);
+    G_OBJECT_CLASS (panorama_org_bluez_agent1_proxy_parent_class)->finalize(object);
 }
 
 static void
-panorama_org_bluez_agent1_proxy_get_property (GObject      *object,
-  guint         prop_id,
-  GValue       *value,
-  GParamSpec   *pspec G_GNUC_UNUSED)
-{
+panorama_org_bluez_agent1_proxy_get_property(GObject *object,
+                                             guint prop_id,
+                                             GValue *value,
+                                             GParamSpec *pspec G_GNUC_UNUSED) {
 }
 
 static void
-panorama_org_bluez_agent1_proxy_set_property (GObject      *object,
-  guint         prop_id,
-  const GValue *value,
-  GParamSpec   *pspec G_GNUC_UNUSED)
-{
+panorama_org_bluez_agent1_proxy_set_property(GObject *object,
+                                             guint prop_id,
+                                             const GValue *value,
+                                             GParamSpec *pspec G_GNUC_UNUSED) {
 }
 
 static void
-panorama_org_bluez_agent1_proxy_g_signal (GDBusProxy *proxy,
-  const gchar *sender_name G_GNUC_UNUSED,
-  const gchar *signal_name,
-  GVariant *parameters)
-{
-  _ExtendedGDBusSignalInfo *info;
-  GVariantIter iter;
-  GVariant *child;
-  GValue *paramv;
-  gsize num_params;
-  gsize n;
-  guint signal_id;
-  info = (_ExtendedGDBusSignalInfo *) g_dbus_interface_info_lookup_signal ((GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, signal_name);
-  if (info == NULL)
-    return;
-  num_params = g_variant_n_children (parameters);
-  paramv = g_new0 (GValue, num_params + 1);
-  g_value_init (&paramv[0], PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
-  g_value_set_object (&paramv[0], proxy);
-  g_variant_iter_init (&iter, parameters);
-  n = 1;
-  while ((child = g_variant_iter_next_value (&iter)) != NULL)
-    {
-      _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.args[n - 1];
-      if (arg_info->use_gvariant)
-        {
-          g_value_init (&paramv[n], G_TYPE_VARIANT);
-          g_value_set_variant (&paramv[n], child);
-          n++;
-        }
-      else
-        g_dbus_gvariant_to_gvalue (child, &paramv[n++]);
-      g_variant_unref (child);
+panorama_org_bluez_agent1_proxy_g_signal(GDBusProxy *proxy,
+                                         const gchar *sender_name G_GNUC_UNUSED,
+                                         const gchar *signal_name,
+                                         GVariant *parameters) {
+    _ExtendedGDBusSignalInfo *info;
+    GVariantIter iter;
+    GVariant *child;
+    GValue *paramv;
+    gsize num_params;
+    gsize n;
+    guint signal_id;
+    info = (_ExtendedGDBusSignalInfo *) g_dbus_interface_info_lookup_signal(
+            (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, signal_name);
+    if (info == NULL)
+        return;
+    num_params = g_variant_n_children(parameters);
+    paramv = g_new0 (GValue, num_params + 1);
+    g_value_init(&paramv[0], PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
+    g_value_set_object(&paramv[0], proxy);
+    g_variant_iter_init(&iter, parameters);
+    n = 1;
+    while ((child = g_variant_iter_next_value(&iter)) != NULL) {
+        _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.args[n - 1];
+        if (arg_info->use_gvariant) {
+            g_value_init(&paramv[n], G_TYPE_VARIANT);
+            g_value_set_variant(&paramv[n], child);
+            n++;
+        } else
+            g_dbus_gvariant_to_gvalue(child, &paramv[n++]);
+        g_variant_unref(child);
     }
-  signal_id = g_signal_lookup (info->signal_name, PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
-  g_signal_emitv (paramv, signal_id, 0, NULL);
-  for (n = 0; n < num_params + 1; n++)
-    g_value_unset (&paramv[n]);
-  g_free (paramv);
+    signal_id = g_signal_lookup(info->signal_name, PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
+    g_signal_emitv(paramv, signal_id, 0, NULL);
+    for (n = 0; n < num_params + 1; n++)
+        g_value_unset(&paramv[n]);
+    g_free(paramv);
 }
 
 static void
-panorama_org_bluez_agent1_proxy_g_properties_changed (GDBusProxy *_proxy,
-  GVariant *changed_properties,
-  const gchar *const *invalidated_properties)
-{
-  PanoramaOrgBluezAgent1Proxy *proxy = PANORAMA_ORG_BLUEZ_AGENT1_PROXY (_proxy);
-  guint n;
-  const gchar *key;
-  GVariantIter *iter;
-  _ExtendedGDBusPropertyInfo *info;
-  g_variant_get (changed_properties, "a{sv}", &iter);
-  while (g_variant_iter_next (iter, "{&sv}", &key, NULL))
-    {
-      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, key);
-      g_datalist_remove_data (&proxy->priv->qdata, key);
-      if (info != NULL)
-        g_object_notify (G_OBJECT (proxy), info->hyphen_name);
+panorama_org_bluez_agent1_proxy_g_properties_changed(GDBusProxy *_proxy,
+                                                     GVariant *changed_properties,
+                                                     const gchar *const *invalidated_properties) {
+    PanoramaOrgBluezAgent1Proxy *proxy = PANORAMA_ORG_BLUEZ_AGENT1_PROXY (_proxy);
+    guint n;
+    const gchar *key;
+    GVariantIter *iter;
+    _ExtendedGDBusPropertyInfo *info;
+    g_variant_get(changed_properties, "a{sv}", &iter);
+    while (g_variant_iter_next(iter, "{&sv}", &key, NULL)) {
+        info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property(
+                (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, key);
+        g_datalist_remove_data (&proxy->priv->qdata, key);
+        if (info != NULL)
+            g_object_notify(G_OBJECT (proxy), info->hyphen_name);
     }
-  g_variant_iter_free (iter);
-  for (n = 0; invalidated_properties[n] != NULL; n++)
-    {
-      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, invalidated_properties[n]);
-      g_datalist_remove_data (&proxy->priv->qdata, invalidated_properties[n]);
-      if (info != NULL)
-        g_object_notify (G_OBJECT (proxy), info->hyphen_name);
+    g_variant_iter_free(iter);
+    for (n = 0; invalidated_properties[n] != NULL; n++) {
+        info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property(
+                (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct,
+                invalidated_properties[n]);
+        g_datalist_remove_data (&proxy->priv->qdata, invalidated_properties[n]);
+        if (info != NULL)
+            g_object_notify(G_OBJECT (proxy), info->hyphen_name);
     }
 }
 
 static void
-panorama_org_bluez_agent1_proxy_init (PanoramaOrgBluezAgent1Proxy *proxy)
-{
+panorama_org_bluez_agent1_proxy_init(PanoramaOrgBluezAgent1Proxy *proxy) {
 #if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38
-  proxy->priv = panorama_org_bluez_agent1_proxy_get_instance_private (proxy);
+    proxy->priv = panorama_org_bluez_agent1_proxy_get_instance_private(proxy);
 #else
-  proxy->priv = G_TYPE_INSTANCE_GET_PRIVATE (proxy, PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, PanoramaOrgBluezAgent1ProxyPrivate);
+    proxy->priv = G_TYPE_INSTANCE_GET_PRIVATE (proxy, PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, PanoramaOrgBluezAgent1ProxyPrivate);
 #endif
 
-  g_dbus_proxy_set_interface_info (G_DBUS_PROXY (proxy), panorama_org_bluez_agent1_interface_info ());
+    g_dbus_proxy_set_interface_info(G_DBUS_PROXY (proxy), panorama_org_bluez_agent1_interface_info());
 }
 
 static void
-panorama_org_bluez_agent1_proxy_class_init (PanoramaOrgBluezAgent1ProxyClass *klass)
-{
-  GObjectClass *gobject_class;
-  GDBusProxyClass *proxy_class;
+panorama_org_bluez_agent1_proxy_class_init(PanoramaOrgBluezAgent1ProxyClass *klass) {
+    GObjectClass *gobject_class;
+    GDBusProxyClass *proxy_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize     = panorama_org_bluez_agent1_proxy_finalize;
-  gobject_class->get_property = panorama_org_bluez_agent1_proxy_get_property;
-  gobject_class->set_property = panorama_org_bluez_agent1_proxy_set_property;
+    gobject_class = G_OBJECT_CLASS (klass);
+    gobject_class->finalize = panorama_org_bluez_agent1_proxy_finalize;
+    gobject_class->get_property = panorama_org_bluez_agent1_proxy_get_property;
+    gobject_class->set_property = panorama_org_bluez_agent1_proxy_set_property;
 
-  proxy_class = G_DBUS_PROXY_CLASS (klass);
-  proxy_class->g_signal = panorama_org_bluez_agent1_proxy_g_signal;
-  proxy_class->g_properties_changed = panorama_org_bluez_agent1_proxy_g_properties_changed;
+    proxy_class = G_DBUS_PROXY_CLASS (klass);
+    proxy_class->g_signal = panorama_org_bluez_agent1_proxy_g_signal;
+    proxy_class->g_properties_changed = panorama_org_bluez_agent1_proxy_g_properties_changed;
 
 #if GLIB_VERSION_MAX_ALLOWED < GLIB_VERSION_2_38
-  g_type_class_add_private (klass, sizeof (PanoramaOrgBluezAgent1ProxyPrivate));
+    g_type_class_add_private (klass, sizeof (PanoramaOrgBluezAgent1ProxyPrivate));
 #endif
 }
 
 static void
-panorama_org_bluez_agent1_proxy_iface_init (PanoramaOrgBluezAgent1Iface *iface)
-{
+panorama_org_bluez_agent1_proxy_iface_init(PanoramaOrgBluezAgent1Iface *iface) {
 }
 
 /**
@@ -2057,16 +2001,17 @@ panorama_org_bluez_agent1_proxy_iface_init (PanoramaOrgBluezAgent1Iface *iface)
  * See panorama_org_bluez_agent1_proxy_new_sync() for the synchronous, blocking version of this constructor.
  */
 void
-panorama_org_bluez_agent1_proxy_new (
-    GDBusConnection     *connection,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GAsyncReadyCallback  callback,
-    gpointer             user_data)
-{
-  g_async_initable_new_async (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "org.bluez.Agent1", NULL);
+panorama_org_bluez_agent1_proxy_new(
+        GDBusConnection *connection,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_async_initable_new_async(PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, G_PRIORITY_DEFAULT, cancellable, callback,
+                               user_data, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path",
+                               object_path, "g-interface-name", "org.bluez.Agent1", NULL);
 }
 
 /**
@@ -2079,19 +2024,18 @@ panorama_org_bluez_agent1_proxy_new (
  * Returns: (transfer full) (type PanoramaOrgBluezAgent1Proxy): The constructed proxy object or %NULL if @error is set.
  */
 PanoramaOrgBluezAgent1 *
-panorama_org_bluez_agent1_proxy_new_finish (
-    GAsyncResult        *res,
-    GError             **error)
-{
-  GObject *ret;
-  GObject *source_object;
-  source_object = g_async_result_get_source_object (res);
-  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);
-  g_object_unref (source_object);
-  if (ret != NULL)
-    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
-  else
-    return NULL;
+panorama_org_bluez_agent1_proxy_new_finish(
+        GAsyncResult *res,
+        GError **error) {
+    GObject *ret;
+    GObject *source_object;
+    source_object = g_async_result_get_source_object(res);
+    ret = g_async_initable_new_finish(G_ASYNC_INITABLE (source_object), res, error);
+    g_object_unref(source_object);
+    if (ret != NULL)
+        return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+    else
+        return NULL;
 }
 
 /**
@@ -2112,20 +2056,21 @@ panorama_org_bluez_agent1_proxy_new_finish (
  * Returns: (transfer full) (type PanoramaOrgBluezAgent1Proxy): The constructed proxy object or %NULL if @error is set.
  */
 PanoramaOrgBluezAgent1 *
-panorama_org_bluez_agent1_proxy_new_sync (
-    GDBusConnection     *connection,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GError             **error)
-{
-  GInitable *ret;
-  ret = g_initable_new (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "org.bluez.Agent1", NULL);
-  if (ret != NULL)
-    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
-  else
-    return NULL;
+panorama_org_bluez_agent1_proxy_new_sync(
+        GDBusConnection *connection,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error) {
+    GInitable *ret;
+    ret = g_initable_new(PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, cancellable, error, "g-flags", flags, "g-name", name,
+                         "g-connection", connection, "g-object-path", object_path, "g-interface-name",
+                         "org.bluez.Agent1", NULL);
+    if (ret != NULL)
+        return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+    else
+        return NULL;
 }
 
 
@@ -2147,16 +2092,17 @@ panorama_org_bluez_agent1_proxy_new_sync (
  * See panorama_org_bluez_agent1_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.
  */
 void
-panorama_org_bluez_agent1_proxy_new_for_bus (
-    GBusType             bus_type,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GAsyncReadyCallback  callback,
-    gpointer             user_data)
-{
-  g_async_initable_new_async (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "org.bluez.Agent1", NULL);
+panorama_org_bluez_agent1_proxy_new_for_bus(
+        GBusType bus_type,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_async_initable_new_async(PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, G_PRIORITY_DEFAULT, cancellable, callback,
+                               user_data, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path",
+                               object_path, "g-interface-name", "org.bluez.Agent1", NULL);
 }
 
 /**
@@ -2169,19 +2115,18 @@ panorama_org_bluez_agent1_proxy_new_for_bus (
  * Returns: (transfer full) (type PanoramaOrgBluezAgent1Proxy): The constructed proxy object or %NULL if @error is set.
  */
 PanoramaOrgBluezAgent1 *
-panorama_org_bluez_agent1_proxy_new_for_bus_finish (
-    GAsyncResult        *res,
-    GError             **error)
-{
-  GObject *ret;
-  GObject *source_object;
-  source_object = g_async_result_get_source_object (res);
-  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);
-  g_object_unref (source_object);
-  if (ret != NULL)
-    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
-  else
-    return NULL;
+panorama_org_bluez_agent1_proxy_new_for_bus_finish(
+        GAsyncResult *res,
+        GError **error) {
+    GObject *ret;
+    GObject *source_object;
+    source_object = g_async_result_get_source_object(res);
+    ret = g_async_initable_new_finish(G_ASYNC_INITABLE (source_object), res, error);
+    g_object_unref(source_object);
+    if (ret != NULL)
+        return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+    else
+        return NULL;
 }
 
 /**
@@ -2202,20 +2147,21 @@ panorama_org_bluez_agent1_proxy_new_for_bus_finish (
  * Returns: (transfer full) (type PanoramaOrgBluezAgent1Proxy): The constructed proxy object or %NULL if @error is set.
  */
 PanoramaOrgBluezAgent1 *
-panorama_org_bluez_agent1_proxy_new_for_bus_sync (
-    GBusType             bus_type,
-    GDBusProxyFlags      flags,
-    const gchar         *name,
-    const gchar         *object_path,
-    GCancellable        *cancellable,
-    GError             **error)
-{
-  GInitable *ret;
-  ret = g_initable_new (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "org.bluez.Agent1", NULL);
-  if (ret != NULL)
-    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
-  else
-    return NULL;
+panorama_org_bluez_agent1_proxy_new_for_bus_sync(
+        GBusType bus_type,
+        GDBusProxyFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error) {
+    GInitable *ret;
+    ret = g_initable_new(PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY, cancellable, error, "g-flags", flags, "g-name", name,
+                         "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "org.bluez.Agent1",
+                         NULL);
+    if (ret != NULL)
+        return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+    else
+        return NULL;
 }
 
 
@@ -2234,262 +2180,251 @@ panorama_org_bluez_agent1_proxy_new_for_bus_sync (
  * Class structure for #PanoramaOrgBluezAgent1Skeleton.
  */
 
-struct _PanoramaOrgBluezAgent1SkeletonPrivate
-{
-  GValue *properties;
-  GList *changed_properties;
-  GSource *changed_properties_idle_source;
-  GMainContext *context;
-  GMutex lock;
+struct _PanoramaOrgBluezAgent1SkeletonPrivate {
+    GValue *properties;
+    GList *changed_properties;
+    GSource *changed_properties_idle_source;
+    GMainContext *context;
+    GMutex lock;
 };
 
 static void
-_panorama_org_bluez_agent1_skeleton_handle_method_call (
-  GDBusConnection *connection G_GNUC_UNUSED,
-  const gchar *sender G_GNUC_UNUSED,
-  const gchar *object_path G_GNUC_UNUSED,
-  const gchar *interface_name,
-  const gchar *method_name,
-  GVariant *parameters,
-  GDBusMethodInvocation *invocation,
-  gpointer user_data)
-{
-  PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
-  _ExtendedGDBusMethodInfo *info;
-  GVariantIter iter;
-  GVariant *child;
-  GValue *paramv;
-  gsize num_params;
-  guint num_extra;
-  gsize n;
-  guint signal_id;
-  GValue return_value = G_VALUE_INIT;
-  info = (_ExtendedGDBusMethodInfo *) g_dbus_method_invocation_get_method_info (invocation);
-  g_assert (info != NULL);
-  num_params = g_variant_n_children (parameters);
-  num_extra = info->pass_fdlist ? 3 : 2;  paramv = g_new0 (GValue, num_params + num_extra);
-  n = 0;
-  g_value_init (&paramv[n], PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
-  g_value_set_object (&paramv[n++], skeleton);
-  g_value_init (&paramv[n], G_TYPE_DBUS_METHOD_INVOCATION);
-  g_value_set_object (&paramv[n++], invocation);
-  if (info->pass_fdlist)
-    {
+_panorama_org_bluez_agent1_skeleton_handle_method_call(
+        GDBusConnection *connection G_GNUC_UNUSED,
+        const gchar *sender G_GNUC_UNUSED,
+        const gchar *object_path G_GNUC_UNUSED,
+        const gchar *interface_name,
+        const gchar *method_name,
+        GVariant *parameters,
+        GDBusMethodInvocation *invocation,
+        gpointer user_data) {
+    PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
+    _ExtendedGDBusMethodInfo *info;
+    GVariantIter iter;
+    GVariant *child;
+    GValue *paramv;
+    gsize num_params;
+    guint num_extra;
+    gsize n;
+    guint signal_id;
+    GValue return_value = G_VALUE_INIT;
+    info = (_ExtendedGDBusMethodInfo *) g_dbus_method_invocation_get_method_info(invocation);
+    g_assert (info != NULL);
+    num_params = g_variant_n_children(parameters);
+    num_extra = info->pass_fdlist ? 3 : 2;
+    paramv = g_new0 (GValue, num_params + num_extra);
+    n = 0;
+    g_value_init(&paramv[n], PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
+    g_value_set_object(&paramv[n++], skeleton);
+    g_value_init(&paramv[n], G_TYPE_DBUS_METHOD_INVOCATION);
+    g_value_set_object(&paramv[n++], invocation);
+    if (info->pass_fdlist) {
 #ifdef G_OS_UNIX
-      g_value_init (&paramv[n], G_TYPE_UNIX_FD_LIST);
-      g_value_set_object (&paramv[n++], g_dbus_message_get_unix_fd_list (g_dbus_method_invocation_get_message (invocation)));
+        g_value_init(&paramv[n], G_TYPE_UNIX_FD_LIST);
+        g_value_set_object(&paramv[n++],
+                           g_dbus_message_get_unix_fd_list(g_dbus_method_invocation_get_message(invocation)));
 #else
-      g_assert_not_reached ();
+        g_assert_not_reached ();
 #endif
     }
-  g_variant_iter_init (&iter, parameters);
-  while ((child = g_variant_iter_next_value (&iter)) != NULL)
-    {
-      _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.in_args[n - num_extra];
-      if (arg_info->use_gvariant)
-        {
-          g_value_init (&paramv[n], G_TYPE_VARIANT);
-          g_value_set_variant (&paramv[n], child);
-          n++;
-        }
-      else
-        g_dbus_gvariant_to_gvalue (child, &paramv[n++]);
-      g_variant_unref (child);
+    g_variant_iter_init(&iter, parameters);
+    while ((child = g_variant_iter_next_value(&iter)) != NULL) {
+        _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.in_args[n - num_extra];
+        if (arg_info->use_gvariant) {
+            g_value_init(&paramv[n], G_TYPE_VARIANT);
+            g_value_set_variant(&paramv[n], child);
+            n++;
+        } else
+            g_dbus_gvariant_to_gvalue(child, &paramv[n++]);
+        g_variant_unref(child);
     }
-  signal_id = g_signal_lookup (info->signal_name, PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
-  g_value_init (&return_value, G_TYPE_BOOLEAN);
-  g_signal_emitv (paramv, signal_id, 0, &return_value);
-  if (!g_value_get_boolean (&return_value))
-    g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Method %s is not implemented on interface %s", method_name, interface_name);
-  g_value_unset (&return_value);
-  for (n = 0; n < num_params + num_extra; n++)
-    g_value_unset (&paramv[n]);
-  g_free (paramv);
+    signal_id = g_signal_lookup(info->signal_name, PANORAMA_TYPE_ORG_BLUEZ_AGENT1);
+    g_value_init(&return_value, G_TYPE_BOOLEAN);
+    g_signal_emitv(paramv, signal_id, 0, &return_value);
+    if (!g_value_get_boolean(&return_value))
+        g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD,
+                                              "Method %s is not implemented on interface %s", method_name,
+                                              interface_name);
+    g_value_unset(&return_value);
+    for (n = 0; n < num_params + num_extra; n++)
+        g_value_unset(&paramv[n]);
+    g_free(paramv);
 }
 
 static GVariant *
-_panorama_org_bluez_agent1_skeleton_handle_get_property (
-  GDBusConnection *connection G_GNUC_UNUSED,
-  const gchar *sender G_GNUC_UNUSED,
-  const gchar *object_path G_GNUC_UNUSED,
-  const gchar *interface_name G_GNUC_UNUSED,
-  const gchar *property_name,
-  GError **error,
-  gpointer user_data)
-{
-  PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
-  GValue value = G_VALUE_INIT;
-  GParamSpec *pspec;
-  _ExtendedGDBusPropertyInfo *info;
-  GVariant *ret;
-  ret = NULL;
-  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, property_name);
-  g_assert (info != NULL);
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);
-  if (pspec == NULL)
-    {
-      g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %s", property_name);
+_panorama_org_bluez_agent1_skeleton_handle_get_property(
+        GDBusConnection *connection G_GNUC_UNUSED,
+        const gchar *sender G_GNUC_UNUSED,
+        const gchar *object_path G_GNUC_UNUSED,
+        const gchar *interface_name G_GNUC_UNUSED,
+        const gchar *property_name,
+        GError **error,
+        gpointer user_data) {
+    PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
+    GValue value = G_VALUE_INIT;
+    GParamSpec *pspec;
+    _ExtendedGDBusPropertyInfo *info;
+    GVariant *ret;
+    ret = NULL;
+    info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property(
+            (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, property_name);
+    g_assert (info != NULL);
+    pspec = g_object_class_find_property(G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);
+    if (pspec == NULL) {
+        g_set_error(error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %s", property_name);
+    } else {
+        g_value_init(&value, pspec->value_type);
+        g_object_get_property(G_OBJECT (skeleton), info->hyphen_name, &value);
+        ret = g_dbus_gvalue_to_gvariant(&value, G_VARIANT_TYPE (info->parent_struct.signature));
+        g_value_unset(&value);
     }
-  else
-    {
-      g_value_init (&value, pspec->value_type);
-      g_object_get_property (G_OBJECT (skeleton), info->hyphen_name, &value);
-      ret = g_dbus_gvalue_to_gvariant (&value, G_VARIANT_TYPE (info->parent_struct.signature));
-      g_value_unset (&value);
-    }
-  return ret;
+    return ret;
 }
 
 static gboolean
-_panorama_org_bluez_agent1_skeleton_handle_set_property (
-  GDBusConnection *connection G_GNUC_UNUSED,
-  const gchar *sender G_GNUC_UNUSED,
-  const gchar *object_path G_GNUC_UNUSED,
-  const gchar *interface_name G_GNUC_UNUSED,
-  const gchar *property_name,
-  GVariant *variant,
-  GError **error,
-  gpointer user_data)
-{
-  PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
-  GValue value = G_VALUE_INIT;
-  GParamSpec *pspec;
-  _ExtendedGDBusPropertyInfo *info;
-  gboolean ret;
-  ret = FALSE;
-  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, property_name);
-  g_assert (info != NULL);
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);
-  if (pspec == NULL)
-    {
-      g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %s", property_name);
+_panorama_org_bluez_agent1_skeleton_handle_set_property(
+        GDBusConnection *connection G_GNUC_UNUSED,
+        const gchar *sender G_GNUC_UNUSED,
+        const gchar *object_path G_GNUC_UNUSED,
+        const gchar *interface_name G_GNUC_UNUSED,
+        const gchar *property_name,
+        GVariant *variant,
+        GError **error,
+        gpointer user_data) {
+    PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (user_data);
+    GValue value = G_VALUE_INIT;
+    GParamSpec *pspec;
+    _ExtendedGDBusPropertyInfo *info;
+    gboolean ret;
+    ret = FALSE;
+    info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property(
+            (GDBusInterfaceInfo *) &_panorama_org_bluez_agent1_interface_info.parent_struct, property_name);
+    g_assert (info != NULL);
+    pspec = g_object_class_find_property(G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);
+    if (pspec == NULL) {
+        g_set_error(error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %s", property_name);
+    } else {
+        if (info->use_gvariant)
+            g_value_set_variant(&value, variant);
+        else
+            g_dbus_gvariant_to_gvalue(variant, &value);
+        g_object_set_property(G_OBJECT (skeleton), info->hyphen_name, &value);
+        g_value_unset(&value);
+        ret = TRUE;
     }
-  else
-    {
-      if (info->use_gvariant)
-        g_value_set_variant (&value, variant);
-      else
-        g_dbus_gvariant_to_gvalue (variant, &value);
-      g_object_set_property (G_OBJECT (skeleton), info->hyphen_name, &value);
-      g_value_unset (&value);
-      ret = TRUE;
-    }
-  return ret;
+    return ret;
 }
 
 static const GDBusInterfaceVTable _panorama_org_bluez_agent1_skeleton_vtable =
-{
-  _panorama_org_bluez_agent1_skeleton_handle_method_call,
-  _panorama_org_bluez_agent1_skeleton_handle_get_property,
-  _panorama_org_bluez_agent1_skeleton_handle_set_property,
-  {NULL}
-};
+        {
+                _panorama_org_bluez_agent1_skeleton_handle_method_call,
+                _panorama_org_bluez_agent1_skeleton_handle_get_property,
+                _panorama_org_bluez_agent1_skeleton_handle_set_property,
+                {NULL}
+        };
 
 static GDBusInterfaceInfo *
-panorama_org_bluez_agent1_skeleton_dbus_interface_get_info (GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED)
-{
-  return panorama_org_bluez_agent1_interface_info ();
+panorama_org_bluez_agent1_skeleton_dbus_interface_get_info(GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED) {
+    return panorama_org_bluez_agent1_interface_info();
 }
 
 static GDBusInterfaceVTable *
-panorama_org_bluez_agent1_skeleton_dbus_interface_get_vtable (GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED)
-{
-  return (GDBusInterfaceVTable *) &_panorama_org_bluez_agent1_skeleton_vtable;
+panorama_org_bluez_agent1_skeleton_dbus_interface_get_vtable(GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED) {
+    return (GDBusInterfaceVTable *) &_panorama_org_bluez_agent1_skeleton_vtable;
 }
 
 static GVariant *
-panorama_org_bluez_agent1_skeleton_dbus_interface_get_properties (GDBusInterfaceSkeleton *_skeleton)
-{
-  PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (_skeleton);
+panorama_org_bluez_agent1_skeleton_dbus_interface_get_properties(GDBusInterfaceSkeleton *_skeleton) {
+    PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (_skeleton);
 
-  GVariantBuilder builder;
-  guint n;
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
-  if (_panorama_org_bluez_agent1_interface_info.parent_struct.properties == NULL)
-    goto out;
-  for (n = 0; _panorama_org_bluez_agent1_interface_info.parent_struct.properties[n] != NULL; n++)
-    {
-      GDBusPropertyInfo *info = _panorama_org_bluez_agent1_interface_info.parent_struct.properties[n];
-      if (info->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE)
-        {
-          GVariant *value;
-          value = _panorama_org_bluez_agent1_skeleton_handle_get_property (g_dbus_interface_skeleton_get_connection (G_DBUS_INTERFACE_SKELETON (skeleton)), NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "org.bluez.Agent1", info->name, NULL, skeleton);
-          if (value != NULL)
-            {
-              g_variant_take_ref (value);
-              g_variant_builder_add (&builder, "{sv}", info->name, value);
-              g_variant_unref (value);
+    GVariantBuilder builder;
+    guint n;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE ("a{sv}"));
+    if (_panorama_org_bluez_agent1_interface_info.parent_struct.properties == NULL)
+        goto out;
+    for (n = 0; _panorama_org_bluez_agent1_interface_info.parent_struct.properties[n] != NULL; n++) {
+        GDBusPropertyInfo *info = _panorama_org_bluez_agent1_interface_info.parent_struct.properties[n];
+        if (info->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE) {
+            GVariant *value;
+            value = _panorama_org_bluez_agent1_skeleton_handle_get_property(
+                    g_dbus_interface_skeleton_get_connection(G_DBUS_INTERFACE_SKELETON (skeleton)), NULL,
+                    g_dbus_interface_skeleton_get_object_path(G_DBUS_INTERFACE_SKELETON (skeleton)), "org.bluez.Agent1",
+                    info->name, NULL, skeleton);
+            if (value != NULL) {
+                g_variant_take_ref(value);
+                g_variant_builder_add(&builder, "{sv}", info->name, value);
+                g_variant_unref(value);
             }
         }
     }
-out:
-  return g_variant_builder_end (&builder);
+    out:
+    return g_variant_builder_end(&builder);
 }
 
 static void
-panorama_org_bluez_agent1_skeleton_dbus_interface_flush (GDBusInterfaceSkeleton *_skeleton)
-{
+panorama_org_bluez_agent1_skeleton_dbus_interface_flush(GDBusInterfaceSkeleton *_skeleton) {
 }
 
-static void panorama_org_bluez_agent1_skeleton_iface_init (PanoramaOrgBluezAgent1Iface *iface);
+static void panorama_org_bluez_agent1_skeleton_iface_init(PanoramaOrgBluezAgent1Iface *iface);
+
 #if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38
-G_DEFINE_TYPE_WITH_CODE (PanoramaOrgBluezAgent1Skeleton, panorama_org_bluez_agent1_skeleton, G_TYPE_DBUS_INTERFACE_SKELETON,
-                         G_ADD_PRIVATE (PanoramaOrgBluezAgent1Skeleton)
-                         G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_ORG_BLUEZ_AGENT1, panorama_org_bluez_agent1_skeleton_iface_init))
+
+G_DEFINE_TYPE_WITH_CODE (PanoramaOrgBluezAgent1Skeleton, panorama_org_bluez_agent1_skeleton,
+                         G_TYPE_DBUS_INTERFACE_SKELETON,
+                         G_ADD_PRIVATE(PanoramaOrgBluezAgent1Skeleton)
+                                 G_IMPLEMENT_INTERFACE(PANORAMA_TYPE_ORG_BLUEZ_AGENT1,
+                                                       panorama_org_bluez_agent1_skeleton_iface_init))
 
 #else
 G_DEFINE_TYPE_WITH_CODE (PanoramaOrgBluezAgent1Skeleton, panorama_org_bluez_agent1_skeleton, G_TYPE_DBUS_INTERFACE_SKELETON,
                          G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_ORG_BLUEZ_AGENT1, panorama_org_bluez_agent1_skeleton_iface_init))
 
 #endif
+
 static void
-panorama_org_bluez_agent1_skeleton_finalize (GObject *object)
-{
-  PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (object);
-  g_list_free_full (skeleton->priv->changed_properties, (GDestroyNotify) _changed_property_free);
-  if (skeleton->priv->changed_properties_idle_source != NULL)
-    g_source_destroy (skeleton->priv->changed_properties_idle_source);
-  g_main_context_unref (skeleton->priv->context);
-  g_mutex_clear (&skeleton->priv->lock);
-  G_OBJECT_CLASS (panorama_org_bluez_agent1_skeleton_parent_class)->finalize (object);
+panorama_org_bluez_agent1_skeleton_finalize(GObject *object) {
+    PanoramaOrgBluezAgent1Skeleton *skeleton = PANORAMA_ORG_BLUEZ_AGENT1_SKELETON (object);
+    g_list_free_full(skeleton->priv->changed_properties, (GDestroyNotify) _changed_property_free);
+    if (skeleton->priv->changed_properties_idle_source != NULL)
+        g_source_destroy(skeleton->priv->changed_properties_idle_source);
+    g_main_context_unref(skeleton->priv->context);
+    g_mutex_clear(&skeleton->priv->lock);
+    G_OBJECT_CLASS (panorama_org_bluez_agent1_skeleton_parent_class)->finalize(object);
 }
 
 static void
-panorama_org_bluez_agent1_skeleton_init (PanoramaOrgBluezAgent1Skeleton *skeleton)
-{
+panorama_org_bluez_agent1_skeleton_init(PanoramaOrgBluezAgent1Skeleton *skeleton) {
 #if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38
-  skeleton->priv = panorama_org_bluez_agent1_skeleton_get_instance_private (skeleton);
+    skeleton->priv = panorama_org_bluez_agent1_skeleton_get_instance_private(skeleton);
 #else
-  skeleton->priv = G_TYPE_INSTANCE_GET_PRIVATE (skeleton, PANORAMA_TYPE_ORG_BLUEZ_AGENT1_SKELETON, PanoramaOrgBluezAgent1SkeletonPrivate);
+    skeleton->priv = G_TYPE_INSTANCE_GET_PRIVATE (skeleton, PANORAMA_TYPE_ORG_BLUEZ_AGENT1_SKELETON, PanoramaOrgBluezAgent1SkeletonPrivate);
 #endif
 
-  g_mutex_init (&skeleton->priv->lock);
-  skeleton->priv->context = g_main_context_ref_thread_default ();
+    g_mutex_init(&skeleton->priv->lock);
+    skeleton->priv->context = g_main_context_ref_thread_default();
 }
 
 static void
-panorama_org_bluez_agent1_skeleton_class_init (PanoramaOrgBluezAgent1SkeletonClass *klass)
-{
-  GObjectClass *gobject_class;
-  GDBusInterfaceSkeletonClass *skeleton_class;
+panorama_org_bluez_agent1_skeleton_class_init(PanoramaOrgBluezAgent1SkeletonClass *klass) {
+    GObjectClass *gobject_class;
+    GDBusInterfaceSkeletonClass *skeleton_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = panorama_org_bluez_agent1_skeleton_finalize;
+    gobject_class = G_OBJECT_CLASS (klass);
+    gobject_class->finalize = panorama_org_bluez_agent1_skeleton_finalize;
 
-  skeleton_class = G_DBUS_INTERFACE_SKELETON_CLASS (klass);
-  skeleton_class->get_info = panorama_org_bluez_agent1_skeleton_dbus_interface_get_info;
-  skeleton_class->get_properties = panorama_org_bluez_agent1_skeleton_dbus_interface_get_properties;
-  skeleton_class->flush = panorama_org_bluez_agent1_skeleton_dbus_interface_flush;
-  skeleton_class->get_vtable = panorama_org_bluez_agent1_skeleton_dbus_interface_get_vtable;
+    skeleton_class = G_DBUS_INTERFACE_SKELETON_CLASS (klass);
+    skeleton_class->get_info = panorama_org_bluez_agent1_skeleton_dbus_interface_get_info;
+    skeleton_class->get_properties = panorama_org_bluez_agent1_skeleton_dbus_interface_get_properties;
+    skeleton_class->flush = panorama_org_bluez_agent1_skeleton_dbus_interface_flush;
+    skeleton_class->get_vtable = panorama_org_bluez_agent1_skeleton_dbus_interface_get_vtable;
 
 #if GLIB_VERSION_MAX_ALLOWED < GLIB_VERSION_2_38
-  g_type_class_add_private (klass, sizeof (PanoramaOrgBluezAgent1SkeletonPrivate));
+    g_type_class_add_private (klass, sizeof (PanoramaOrgBluezAgent1SkeletonPrivate));
 #endif
 }
 
 static void
-panorama_org_bluez_agent1_skeleton_iface_init (PanoramaOrgBluezAgent1Iface *iface)
-{
+panorama_org_bluez_agent1_skeleton_iface_init(PanoramaOrgBluezAgent1Iface *iface) {
 }
 
 /**
@@ -2500,9 +2435,8 @@ panorama_org_bluez_agent1_skeleton_iface_init (PanoramaOrgBluezAgent1Iface *ifac
  * Returns: (transfer full) (type PanoramaOrgBluezAgent1Skeleton): The skeleton object.
  */
 PanoramaOrgBluezAgent1 *
-panorama_org_bluez_agent1_skeleton_new (void)
-{
-  return PANORAMA_ORG_BLUEZ_AGENT1 (g_object_new (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_SKELETON, NULL));
+panorama_org_bluez_agent1_skeleton_new(void) {
+    return PANORAMA_ORG_BLUEZ_AGENT1 (g_object_new(PANORAMA_TYPE_ORG_BLUEZ_AGENT1_SKELETON, NULL));
 }
 
 /* ------------------------------------------------------------------------
@@ -2532,19 +2466,23 @@ panorama_org_bluez_agent1_skeleton_new (void)
  */
 
 typedef PanoramaObjectIface PanoramaObjectInterface;
-G_DEFINE_INTERFACE_WITH_CODE (PanoramaObject, panorama_object, G_TYPE_OBJECT, g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_DBUS_OBJECT);)
+
+G_DEFINE_INTERFACE_WITH_CODE (PanoramaObject, panorama_object, G_TYPE_OBJECT,
+                              g_type_interface_add_prerequisite(g_define_type_id, G_TYPE_DBUS_OBJECT);)
 
 static void
-panorama_object_default_init (PanoramaObjectIface *iface)
-{
-  /**
-   * PanoramaObject:org-bluez-agent1:
-   *
-   * The #PanoramaOrgBluezAgent1 instance corresponding to the D-Bus interface <link linkend="gdbus-interface-org-bluez-Agent1.top_of_page">org.bluez.Agent1</link>, if any.
-   *
-   * Connect to the #GObject::notify signal to get informed of property changes.
-   */
-  g_object_interface_install_property (iface, g_param_spec_object ("org-bluez-agent1", "org-bluez-agent1", "org-bluez-agent1", PANORAMA_TYPE_ORG_BLUEZ_AGENT1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+panorama_object_default_init(PanoramaObjectIface *iface) {
+    /**
+     * PanoramaObject:org-bluez-agent1:
+     *
+     * The #PanoramaOrgBluezAgent1 instance corresponding to the D-Bus interface <link linkend="gdbus-interface-org-bluez-Agent1.top_of_page">org.bluez.Agent1</link>, if any.
+     *
+     * Connect to the #GObject::notify signal to get informed of property changes.
+     */
+    g_object_interface_install_property(iface,
+                                        g_param_spec_object("org-bluez-agent1", "org-bluez-agent1", "org-bluez-agent1",
+                                                            PANORAMA_TYPE_ORG_BLUEZ_AGENT1,
+                                                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
 }
 
@@ -2556,13 +2494,12 @@ panorama_object_default_init (PanoramaObjectIface *iface)
  *
  * Returns: (transfer full) (nullable): A #PanoramaOrgBluezAgent1 that must be freed with g_object_unref() or %NULL if @object does not implement the interface.
  */
-PanoramaOrgBluezAgent1 *panorama_object_get_org_bluez_agent1 (PanoramaObject *object)
-{
-  GDBusInterface *ret;
-  ret = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "org.bluez.Agent1");
-  if (ret == NULL)
-    return NULL;
-  return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+PanoramaOrgBluezAgent1 *panorama_object_get_org_bluez_agent1(PanoramaObject *object) {
+    GDBusInterface *ret;
+    ret = g_dbus_object_get_interface(G_DBUS_OBJECT (object), "org.bluez.Agent1");
+    if (ret == NULL)
+        return NULL;
+    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
 }
 
 
@@ -2576,26 +2513,24 @@ PanoramaOrgBluezAgent1 *panorama_object_get_org_bluez_agent1 (PanoramaObject *ob
  *
  * Returns: (transfer none) (nullable): A #PanoramaOrgBluezAgent1 or %NULL if @object does not implement the interface. Do not free the returned object, it is owned by @object.
  */
-PanoramaOrgBluezAgent1 *panorama_object_peek_org_bluez_agent1 (PanoramaObject *object)
-{
-  GDBusInterface *ret;
-  ret = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "org.bluez.Agent1");
-  if (ret == NULL)
-    return NULL;
-  g_object_unref (ret);
-  return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
+PanoramaOrgBluezAgent1 *panorama_object_peek_org_bluez_agent1(PanoramaObject *object) {
+    GDBusInterface *ret;
+    ret = g_dbus_object_get_interface(G_DBUS_OBJECT (object), "org.bluez.Agent1");
+    if (ret == NULL)
+        return NULL;
+    g_object_unref(ret);
+    return PANORAMA_ORG_BLUEZ_AGENT1 (ret);
 }
 
 
 static void
-panorama_object_notify (GDBusObject *object, GDBusInterface *interface)
-{
-  _ExtendedGDBusInterfaceInfo *info = (_ExtendedGDBusInterfaceInfo *) g_dbus_interface_get_info (interface);
-  /* info can be NULL if the other end is using a D-Bus interface we don't know
-   * anything about, for example old generated code in this process talking to
-   * newer generated code in the other process. */
-  if (info != NULL)
-    g_object_notify (G_OBJECT (object), info->hyphen_name);
+panorama_object_notify(GDBusObject *object, GDBusInterface *interface) {
+    _ExtendedGDBusInterfaceInfo *info = (_ExtendedGDBusInterfaceInfo *) g_dbus_interface_get_info(interface);
+    /* info can be NULL if the other end is using a D-Bus interface we don't know
+     * anything about, for example old generated code in this process talking to
+     * newer generated code in the other process. */
+    if (info != NULL)
+        g_object_notify(G_OBJECT (object), info->hyphen_name);
 }
 
 /**
@@ -2612,67 +2547,61 @@ panorama_object_notify (GDBusObject *object, GDBusInterface *interface)
  */
 
 static void
-panorama_object_proxy__panorama_object_iface_init (PanoramaObjectIface *iface G_GNUC_UNUSED)
-{
+panorama_object_proxy__panorama_object_iface_init(PanoramaObjectIface *iface G_GNUC_UNUSED) {
 }
 
 static void
-panorama_object_proxy__g_dbus_object_iface_init (GDBusObjectIface *iface)
-{
-  iface->interface_added = panorama_object_notify;
-  iface->interface_removed = panorama_object_notify;
+panorama_object_proxy__g_dbus_object_iface_init(GDBusObjectIface *iface) {
+    iface->interface_added = panorama_object_notify;
+    iface->interface_removed = panorama_object_notify;
 }
 
 
 G_DEFINE_TYPE_WITH_CODE (PanoramaObjectProxy, panorama_object_proxy, G_TYPE_DBUS_OBJECT_PROXY,
-                         G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_OBJECT, panorama_object_proxy__panorama_object_iface_init)
-                         G_IMPLEMENT_INTERFACE (G_TYPE_DBUS_OBJECT, panorama_object_proxy__g_dbus_object_iface_init))
+                         G_IMPLEMENT_INTERFACE(PANORAMA_TYPE_OBJECT, panorama_object_proxy__panorama_object_iface_init)
+                                 G_IMPLEMENT_INTERFACE(G_TYPE_DBUS_OBJECT,
+                                                       panorama_object_proxy__g_dbus_object_iface_init))
 
 static void
-panorama_object_proxy_init (PanoramaObjectProxy *object G_GNUC_UNUSED)
-{
+panorama_object_proxy_init(PanoramaObjectProxy *object G_GNUC_UNUSED) {
 }
 
 static void
-panorama_object_proxy_set_property (GObject      *gobject,
-  guint         prop_id,
-  const GValue *value G_GNUC_UNUSED,
-  GParamSpec   *pspec)
-{
-  G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+panorama_object_proxy_set_property(GObject *gobject,
+                                   guint prop_id,
+                                   const GValue *value G_GNUC_UNUSED,
+                                   GParamSpec *pspec) {
+    G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
 }
 
 static void
-panorama_object_proxy_get_property (GObject      *gobject,
-  guint         prop_id,
-  GValue       *value,
-  GParamSpec   *pspec)
-{
-  PanoramaObjectProxy *object = PANORAMA_OBJECT_PROXY (gobject);
-  GDBusInterface *interface;
+panorama_object_proxy_get_property(GObject *gobject,
+                                   guint prop_id,
+                                   GValue *value,
+                                   GParamSpec *pspec) {
+    PanoramaObjectProxy *object = PANORAMA_OBJECT_PROXY (gobject);
+    GDBusInterface *interface;
 
-  switch (prop_id)
-    {
-    case 1:
-      interface = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "org.bluez.Agent1");
-      g_value_take_object (value, interface);
-      break;
+    switch (prop_id) {
+        case 1:
+            interface = g_dbus_object_get_interface(G_DBUS_OBJECT (object), "org.bluez.Agent1");
+            g_value_take_object(value, interface);
+            break;
 
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
-      break;
-  }
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+            break;
+    }
 }
 
 static void
-panorama_object_proxy_class_init (PanoramaObjectProxyClass *klass)
-{
-  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+panorama_object_proxy_class_init(PanoramaObjectProxyClass *klass) {
+    GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->set_property = panorama_object_proxy_set_property;
-  gobject_class->get_property = panorama_object_proxy_get_property;
+    gobject_class->set_property = panorama_object_proxy_set_property;
+    gobject_class->get_property = panorama_object_proxy_get_property;
 
-  g_object_class_override_property (gobject_class, 1, "org-bluez-agent1");
+    g_object_class_override_property(gobject_class, 1, "org-bluez-agent1");
 }
 
 /**
@@ -2685,12 +2614,12 @@ panorama_object_proxy_class_init (PanoramaObjectProxyClass *klass)
  * Returns: (transfer full): The proxy object.
  */
 PanoramaObjectProxy *
-panorama_object_proxy_new (GDBusConnection *connection,
-  const gchar *object_path)
-{
-  g_return_val_if_fail (G_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
-  return PANORAMA_OBJECT_PROXY (g_object_new (PANORAMA_TYPE_OBJECT_PROXY, "g-connection", connection, "g-object-path", object_path, NULL));
+panorama_object_proxy_new(GDBusConnection *connection,
+                          const gchar *object_path) {
+    g_return_val_if_fail (G_IS_DBUS_CONNECTION(connection), NULL);
+    g_return_val_if_fail (g_variant_is_object_path(object_path), NULL);
+    return PANORAMA_OBJECT_PROXY (
+            g_object_new(PANORAMA_TYPE_OBJECT_PROXY, "g-connection", connection, "g-object-path", object_path, NULL));
 }
 
 /**
@@ -2707,88 +2636,79 @@ panorama_object_proxy_new (GDBusConnection *connection,
  */
 
 static void
-panorama_object_skeleton__panorama_object_iface_init (PanoramaObjectIface *iface G_GNUC_UNUSED)
-{
+panorama_object_skeleton__panorama_object_iface_init(PanoramaObjectIface *iface G_GNUC_UNUSED) {
 }
 
 
 static void
-panorama_object_skeleton__g_dbus_object_iface_init (GDBusObjectIface *iface)
-{
-  iface->interface_added = panorama_object_notify;
-  iface->interface_removed = panorama_object_notify;
+panorama_object_skeleton__g_dbus_object_iface_init(GDBusObjectIface *iface) {
+    iface->interface_added = panorama_object_notify;
+    iface->interface_removed = panorama_object_notify;
 }
 
 G_DEFINE_TYPE_WITH_CODE (PanoramaObjectSkeleton, panorama_object_skeleton, G_TYPE_DBUS_OBJECT_SKELETON,
-                         G_IMPLEMENT_INTERFACE (PANORAMA_TYPE_OBJECT, panorama_object_skeleton__panorama_object_iface_init)
-                         G_IMPLEMENT_INTERFACE (G_TYPE_DBUS_OBJECT, panorama_object_skeleton__g_dbus_object_iface_init))
+                         G_IMPLEMENT_INTERFACE(PANORAMA_TYPE_OBJECT,
+                                               panorama_object_skeleton__panorama_object_iface_init)
+                                 G_IMPLEMENT_INTERFACE(G_TYPE_DBUS_OBJECT,
+                                                       panorama_object_skeleton__g_dbus_object_iface_init))
 
 static void
-panorama_object_skeleton_init (PanoramaObjectSkeleton *object G_GNUC_UNUSED)
-{
+panorama_object_skeleton_init(PanoramaObjectSkeleton *object G_GNUC_UNUSED) {
 }
 
 static void
-panorama_object_skeleton_set_property (GObject      *gobject,
-  guint         prop_id,
-  const GValue *value,
-  GParamSpec   *pspec)
-{
-  PanoramaObjectSkeleton *object = PANORAMA_OBJECT_SKELETON (gobject);
-  GDBusInterfaceSkeleton *interface;
+panorama_object_skeleton_set_property(GObject *gobject,
+                                      guint prop_id,
+                                      const GValue *value,
+                                      GParamSpec *pspec) {
+    PanoramaObjectSkeleton *object = PANORAMA_OBJECT_SKELETON (gobject);
+    GDBusInterfaceSkeleton *interface;
 
-  switch (prop_id)
-    {
-    case 1:
-      interface = g_value_get_object (value);
-      if (interface != NULL)
-        {
-          g_warn_if_fail (PANORAMA_IS_ORG_BLUEZ_AGENT1 (interface));
-          g_dbus_object_skeleton_add_interface (G_DBUS_OBJECT_SKELETON (object), interface);
-        }
-      else
-        {
-          g_dbus_object_skeleton_remove_interface_by_name (G_DBUS_OBJECT_SKELETON (object), "org.bluez.Agent1");
-        }
-      break;
+    switch (prop_id) {
+        case 1:
+            interface = g_value_get_object(value);
+            if (interface != NULL) {
+                g_warn_if_fail (PANORAMA_IS_ORG_BLUEZ_AGENT1(interface));
+                g_dbus_object_skeleton_add_interface(G_DBUS_OBJECT_SKELETON (object), interface);
+            } else {
+                g_dbus_object_skeleton_remove_interface_by_name(G_DBUS_OBJECT_SKELETON (object), "org.bluez.Agent1");
+            }
+            break;
 
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
-      break;
-  }
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+            break;
+    }
 }
 
 static void
-panorama_object_skeleton_get_property (GObject      *gobject,
-  guint         prop_id,
-  GValue       *value,
-  GParamSpec   *pspec)
-{
-  PanoramaObjectSkeleton *object = PANORAMA_OBJECT_SKELETON (gobject);
-  GDBusInterface *interface;
+panorama_object_skeleton_get_property(GObject *gobject,
+                                      guint prop_id,
+                                      GValue *value,
+                                      GParamSpec *pspec) {
+    PanoramaObjectSkeleton *object = PANORAMA_OBJECT_SKELETON (gobject);
+    GDBusInterface *interface;
 
-  switch (prop_id)
-    {
-    case 1:
-      interface = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "org.bluez.Agent1");
-      g_value_take_object (value, interface);
-      break;
+    switch (prop_id) {
+        case 1:
+            interface = g_dbus_object_get_interface(G_DBUS_OBJECT (object), "org.bluez.Agent1");
+            g_value_take_object(value, interface);
+            break;
 
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
-      break;
-  }
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+            break;
+    }
 }
 
 static void
-panorama_object_skeleton_class_init (PanoramaObjectSkeletonClass *klass)
-{
-  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+panorama_object_skeleton_class_init(PanoramaObjectSkeletonClass *klass) {
+    GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->set_property = panorama_object_skeleton_set_property;
-  gobject_class->get_property = panorama_object_skeleton_get_property;
+    gobject_class->set_property = panorama_object_skeleton_set_property;
+    gobject_class->get_property = panorama_object_skeleton_get_property;
 
-  g_object_class_override_property (gobject_class, 1, "org-bluez-agent1");
+    g_object_class_override_property(gobject_class, 1, "org-bluez-agent1");
 }
 
 /**
@@ -2800,10 +2720,9 @@ panorama_object_skeleton_class_init (PanoramaObjectSkeletonClass *klass)
  * Returns: (transfer full): The skeleton object.
  */
 PanoramaObjectSkeleton *
-panorama_object_skeleton_new (const gchar *object_path)
-{
-  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
-  return PANORAMA_OBJECT_SKELETON (g_object_new (PANORAMA_TYPE_OBJECT_SKELETON, "g-object-path", object_path, NULL));
+panorama_object_skeleton_new(const gchar *object_path) {
+    g_return_val_if_fail (g_variant_is_object_path(object_path), NULL);
+    return PANORAMA_OBJECT_SKELETON (g_object_new(PANORAMA_TYPE_OBJECT_SKELETON, "g-object-path", object_path, NULL));
 }
 
 /**
@@ -2813,9 +2732,8 @@ panorama_object_skeleton_new (const gchar *object_path)
  *
  * Sets the #PanoramaOrgBluezAgent1 instance for the D-Bus interface <link linkend="gdbus-interface-org-bluez-Agent1.top_of_page">org.bluez.Agent1</link> on @object.
  */
-void panorama_object_skeleton_set_org_bluez_agent1 (PanoramaObjectSkeleton *object, PanoramaOrgBluezAgent1 *interface_)
-{
-  g_object_set (G_OBJECT (object), "org-bluez-agent1", interface_, NULL);
+void panorama_object_skeleton_set_org_bluez_agent1(PanoramaObjectSkeleton *object, PanoramaOrgBluezAgent1 *interface_) {
+    g_object_set(G_OBJECT (object), "org-bluez-agent1", interface_, NULL);
 }
 
 
@@ -2848,13 +2766,11 @@ void panorama_object_skeleton_set_org_bluez_agent1 (PanoramaObjectSkeleton *obje
 G_DEFINE_TYPE (PanoramaObjectManagerClient, panorama_object_manager_client, G_TYPE_DBUS_OBJECT_MANAGER_CLIENT)
 
 static void
-panorama_object_manager_client_init (PanoramaObjectManagerClient *manager G_GNUC_UNUSED)
-{
+panorama_object_manager_client_init(PanoramaObjectManagerClient *manager G_GNUC_UNUSED) {
 }
 
 static void
-panorama_object_manager_client_class_init (PanoramaObjectManagerClientClass *klass G_GNUC_UNUSED)
-{
+panorama_object_manager_client_class_init(PanoramaObjectManagerClientClass *klass G_GNUC_UNUSED) {
 }
 
 /**
@@ -2869,24 +2785,25 @@ panorama_object_manager_client_class_init (PanoramaObjectManagerClientClass *kla
  * Returns: A #GDBusProxy derived #GType if @interface_name is not %NULL, otherwise the #GType for #PanoramaObjectProxy.
  */
 GType
-panorama_object_manager_client_get_proxy_type (GDBusObjectManagerClient *manager G_GNUC_UNUSED, const gchar *object_path G_GNUC_UNUSED, const gchar *interface_name, gpointer user_data G_GNUC_UNUSED)
-{
-  static gsize once_init_value = 0;
-  static GHashTable *lookup_hash;
-  GType ret;
+panorama_object_manager_client_get_proxy_type(GDBusObjectManagerClient *manager G_GNUC_UNUSED,
+                                              const gchar *object_path G_GNUC_UNUSED, const gchar *interface_name,
+                                              gpointer user_data G_GNUC_UNUSED) {
+    static gsize once_init_value = 0;
+    static GHashTable *lookup_hash;
+    GType ret;
 
-  if (interface_name == NULL)
-    return PANORAMA_TYPE_OBJECT_PROXY;
-  if (g_once_init_enter (&once_init_value))
-    {
-      lookup_hash = g_hash_table_new (g_str_hash, g_str_equal);
-      g_hash_table_insert (lookup_hash, (gpointer) "org.bluez.Agent1", GSIZE_TO_POINTER (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY));
-      g_once_init_leave (&once_init_value, 1);
+    if (interface_name == NULL)
+        return PANORAMA_TYPE_OBJECT_PROXY;
+    if (g_once_init_enter (&once_init_value)) {
+        lookup_hash = g_hash_table_new(g_str_hash, g_str_equal);
+        g_hash_table_insert(lookup_hash, (gpointer) "org.bluez.Agent1",
+                            GSIZE_TO_POINTER (PANORAMA_TYPE_ORG_BLUEZ_AGENT1_PROXY));
+        g_once_init_leave (&once_init_value, 1);
     }
-  ret = (GType) GPOINTER_TO_SIZE (g_hash_table_lookup (lookup_hash, interface_name));
-  if (ret == (GType) 0)
-    ret = G_TYPE_DBUS_PROXY;
-  return ret;
+    ret = (GType) GPOINTER_TO_SIZE (g_hash_table_lookup(lookup_hash, interface_name));
+    if (ret == (GType) 0)
+        ret = G_TYPE_DBUS_PROXY;
+    return ret;
 }
 
 /**
@@ -2907,16 +2824,17 @@ panorama_object_manager_client_get_proxy_type (GDBusObjectManagerClient *manager
  * See panorama_object_manager_client_new_sync() for the synchronous, blocking version of this constructor.
  */
 void
-panorama_object_manager_client_new (
-    GDBusConnection        *connection,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GAsyncReadyCallback     callback,
-    gpointer                user_data)
-{
-  g_async_initable_new_async (PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
+panorama_object_manager_client_new(
+        GDBusConnection *connection,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_async_initable_new_async(PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback,
+                               user_data, "flags", flags, "name", name, "connection", connection, "object-path",
+                               object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
 }
 
 /**
@@ -2929,19 +2847,18 @@ panorama_object_manager_client_new (
  * Returns: (transfer full) (type PanoramaObjectManagerClient): The constructed object manager client or %NULL if @error is set.
  */
 GDBusObjectManager *
-panorama_object_manager_client_new_finish (
-    GAsyncResult        *res,
-    GError             **error)
-{
-  GObject *ret;
-  GObject *source_object;
-  source_object = g_async_result_get_source_object (res);
-  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);
-  g_object_unref (source_object);
-  if (ret != NULL)
-    return G_DBUS_OBJECT_MANAGER (ret);
-  else
-    return NULL;
+panorama_object_manager_client_new_finish(
+        GAsyncResult *res,
+        GError **error) {
+    GObject *ret;
+    GObject *source_object;
+    source_object = g_async_result_get_source_object(res);
+    ret = g_async_initable_new_finish(G_ASYNC_INITABLE (source_object), res, error);
+    g_object_unref(source_object);
+    if (ret != NULL)
+        return G_DBUS_OBJECT_MANAGER (ret);
+    else
+        return NULL;
 }
 
 /**
@@ -2962,20 +2879,21 @@ panorama_object_manager_client_new_finish (
  * Returns: (transfer full) (type PanoramaObjectManagerClient): The constructed object manager client or %NULL if @error is set.
  */
 GDBusObjectManager *
-panorama_object_manager_client_new_sync (
-    GDBusConnection        *connection,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GError                **error)
-{
-  GInitable *ret;
-  ret = g_initable_new (PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
-  if (ret != NULL)
-    return G_DBUS_OBJECT_MANAGER (ret);
-  else
-    return NULL;
+panorama_object_manager_client_new_sync(
+        GDBusConnection *connection,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error) {
+    GInitable *ret;
+    ret = g_initable_new(PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name,
+                         "connection", connection, "object-path", object_path, "get-proxy-type-func",
+                         panorama_object_manager_client_get_proxy_type, NULL);
+    if (ret != NULL)
+        return G_DBUS_OBJECT_MANAGER (ret);
+    else
+        return NULL;
 }
 
 
@@ -2997,16 +2915,17 @@ panorama_object_manager_client_new_sync (
  * See panorama_object_manager_client_new_for_bus_sync() for the synchronous, blocking version of this constructor.
  */
 void
-panorama_object_manager_client_new_for_bus (
-    GBusType                bus_type,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GAsyncReadyCallback     callback,
-    gpointer                user_data)
-{
-  g_async_initable_new_async (PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
+panorama_object_manager_client_new_for_bus(
+        GBusType bus_type,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GAsyncReadyCallback callback,
+        gpointer user_data) {
+    g_async_initable_new_async(PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback,
+                               user_data, "flags", flags, "name", name, "bus-type", bus_type, "object-path",
+                               object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
 }
 
 /**
@@ -3019,19 +2938,18 @@ panorama_object_manager_client_new_for_bus (
  * Returns: (transfer full) (type PanoramaObjectManagerClient): The constructed object manager client or %NULL if @error is set.
  */
 GDBusObjectManager *
-panorama_object_manager_client_new_for_bus_finish (
-    GAsyncResult        *res,
-    GError             **error)
-{
-  GObject *ret;
-  GObject *source_object;
-  source_object = g_async_result_get_source_object (res);
-  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);
-  g_object_unref (source_object);
-  if (ret != NULL)
-    return G_DBUS_OBJECT_MANAGER (ret);
-  else
-    return NULL;
+panorama_object_manager_client_new_for_bus_finish(
+        GAsyncResult *res,
+        GError **error) {
+    GObject *ret;
+    GObject *source_object;
+    source_object = g_async_result_get_source_object(res);
+    ret = g_async_initable_new_finish(G_ASYNC_INITABLE (source_object), res, error);
+    g_object_unref(source_object);
+    if (ret != NULL)
+        return G_DBUS_OBJECT_MANAGER (ret);
+    else
+        return NULL;
 }
 
 /**
@@ -3052,20 +2970,21 @@ panorama_object_manager_client_new_for_bus_finish (
  * Returns: (transfer full) (type PanoramaObjectManagerClient): The constructed object manager client or %NULL if @error is set.
  */
 GDBusObjectManager *
-panorama_object_manager_client_new_for_bus_sync (
-    GBusType                bus_type,
-    GDBusObjectManagerClientFlags  flags,
-    const gchar            *name,
-    const gchar            *object_path,
-    GCancellable           *cancellable,
-    GError                **error)
-{
-  GInitable *ret;
-  ret = g_initable_new (PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", panorama_object_manager_client_get_proxy_type, NULL);
-  if (ret != NULL)
-    return G_DBUS_OBJECT_MANAGER (ret);
-  else
-    return NULL;
+panorama_object_manager_client_new_for_bus_sync(
+        GBusType bus_type,
+        GDBusObjectManagerClientFlags flags,
+        const gchar *name,
+        const gchar *object_path,
+        GCancellable *cancellable,
+        GError **error) {
+    GInitable *ret;
+    ret = g_initable_new(PANORAMA_TYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name,
+                         "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func",
+                         panorama_object_manager_client_get_proxy_type, NULL);
+    if (ret != NULL)
+        return G_DBUS_OBJECT_MANAGER (ret);
+    else
+        return NULL;
 }
 
 

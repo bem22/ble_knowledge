@@ -1,186 +1,321 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-]>
+        "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+        ]>
 <refentry id="gdbus-org.bluez.Agent1">
-  <refmeta>    <refentrytitle role="top_of_page" id="gdbus-interface-org-bluez-Agent1.top_of_page">org.bluez.Agent1</refentrytitle>
-  <indexterm zone="gdbus-interface-org-bluez-Agent1.top_of_page"><primary sortas="org.bluez.Agent1">org.bluez.Agent1</primary></indexterm>
-  </refmeta>  <refnamediv>    <refname>org.bluez.Agent1</refname>    <refpurpose></refpurpose>  </refnamediv>  <refsynopsisdiv role="synopsis">
-    <title role="synopsis.title">Methods</title>
-    <synopsis>
-<link linkend="gdbus-method-org-bluez-Agent1.Release">Release</link>              ();
-<link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode</link>       (IN  o objectpath,
-                      OUT s pincode);
-<link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode</link>       (IN  o objectpath,
-                      IN  s pincode);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey</link>       (IN  o objectpath,
-                      OUT u passkey);
-<link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey</link>       (IN  o objectpath,
-                      IN  u passkey,
-                      IN  q entered);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation</link>  (IN  o bjectpath,
-                      IN  u passkey);
-<link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization</link> (IN  o objectpath);
-<link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService</link>     (IN  o objectpath,
-                      IN  s uuid);
-<link linkend="gdbus-method-org-bluez-Agent1.Cancel">Cancel</link>               ();
-</synopsis>
-  </refsynopsisdiv>
-<refsect1 role="desc" id="gdbus-interface-org-bluez-Agent1">
-  <title role="desc.title">Description</title>
-  <para></para>
-</refsect1>
-<refsect1 role="details" id="gdbus-methods-org.bluez.Agent1">
-  <title role="details.title">Method Details</title>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.Release">
-  <title>The Release() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.Release"><primary sortas="org.bluez.Agent1.Release">org.bluez.Agent1.Release()</primary></indexterm>
-<programlisting>
-Release ();
-</programlisting>
-<para></para>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestPinCode">
-  <title>The RequestPinCode() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPinCode"><primary sortas="org.bluez.Agent1.RequestPinCode">org.bluez.Agent1.RequestPinCode()</primary></indexterm>
-<programlisting>
-RequestPinCode (IN  o objectpath,
+    <refmeta>
+        <refentrytitle role="top_of_page" id="gdbus-interface-org-bluez-Agent1.top_of_page">org.bluez.Agent1
+        </refentrytitle>
+        <indexterm zone="gdbus-interface-org-bluez-Agent1.top_of_page">
+            <primary sortas="org.bluez.Agent1">org.bluez.Agent1</primary>
+        </indexterm>
+    </refmeta>
+    <refnamediv>
+        <refname>org.bluez.Agent1</refname>
+        <refpurpose></refpurpose>
+    </refnamediv>
+    <refsynopsisdiv role="synopsis">
+        <title role="synopsis.title">Methods</title>
+        <synopsis>
+            <link linkend="gdbus-method-org-bluez-Agent1.Release">Release</link>
+            ();
+            <link linkend="gdbus-method-org-bluez-Agent1.RequestPinCode">RequestPinCode</link>
+            (IN o objectpath,
+            OUT s pincode);
+            <link linkend="gdbus-method-org-bluez-Agent1.DisplayPinCode">DisplayPinCode</link>
+            (IN o objectpath,
+            IN s pincode);
+            <link linkend="gdbus-method-org-bluez-Agent1.RequestPasskey">RequestPasskey</link>
+            (IN o objectpath,
+            OUT u passkey);
+            <link linkend="gdbus-method-org-bluez-Agent1.DisplayPasskey">DisplayPasskey</link>
+            (IN o objectpath,
+            IN u passkey,
+            IN q entered);
+            <link linkend="gdbus-method-org-bluez-Agent1.RequestConfirmation">RequestConfirmation</link>
+            (IN o bjectpath,
+            IN u passkey);
+            <link linkend="gdbus-method-org-bluez-Agent1.RequestAuthorization">RequestAuthorization</link>
+            (IN o objectpath);
+            <link linkend="gdbus-method-org-bluez-Agent1.AuthorizeService">AuthorizeService</link>
+            (IN o objectpath,
+            IN s uuid);
+            <link linkend="gdbus-method-org-bluez-Agent1.Cancel">Cancel</link>
+            ();
+        </synopsis>
+    </refsynopsisdiv>
+    <refsect1 role="desc" id="gdbus-interface-org-bluez-Agent1">
+        <title role="desc.title">Description</title>
+        <para></para>
+    </refsect1>
+    <refsect1 role="details" id="gdbus-methods-org.bluez.Agent1">
+        <title role="details.title">Method Details</title>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.Release">
+            <title>The Release() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.Release">
+                <primary sortas="org.bluez.Agent1.Release">org.bluez.Agent1.Release()</primary>
+            </indexterm>
+            <programlisting>
+                Release ();
+            </programlisting>
+            <para></para>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestPinCode">
+            <title>The RequestPinCode() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPinCode">
+                <primary sortas="org.bluez.Agent1.RequestPinCode">org.bluez.Agent1.RequestPinCode()</primary>
+            </indexterm>
+            <programlisting>
+                RequestPinCode (IN o objectpath,
                 OUT s pincode);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>OUT s <parameter>pincode</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.DisplayPinCode">
-  <title>The DisplayPinCode() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPinCode"><primary sortas="org.bluez.Agent1.DisplayPinCode">org.bluez.Agent1.DisplayPinCode()</primary></indexterm>
-<programlisting>
-DisplayPinCode (IN  o objectpath,
-                IN  s pincode);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>IN s <parameter>pincode</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestPasskey">
-  <title>The RequestPasskey() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPasskey"><primary sortas="org.bluez.Agent1.RequestPasskey">org.bluez.Agent1.RequestPasskey()</primary></indexterm>
-<programlisting>
-RequestPasskey (IN  o objectpath,
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>OUT s
+                            <parameter>pincode</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.DisplayPinCode">
+            <title>The DisplayPinCode() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPinCode">
+                <primary sortas="org.bluez.Agent1.DisplayPinCode">org.bluez.Agent1.DisplayPinCode()</primary>
+            </indexterm>
+            <programlisting>
+                DisplayPinCode (IN o objectpath,
+                IN s pincode);
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>IN s
+                            <parameter>pincode</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestPasskey">
+            <title>The RequestPasskey() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.RequestPasskey">
+                <primary sortas="org.bluez.Agent1.RequestPasskey">org.bluez.Agent1.RequestPasskey()</primary>
+            </indexterm>
+            <programlisting>
+                RequestPasskey (IN o objectpath,
                 OUT u passkey);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>OUT u <parameter>passkey</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.DisplayPasskey">
-  <title>The DisplayPasskey() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPasskey"><primary sortas="org.bluez.Agent1.DisplayPasskey">org.bluez.Agent1.DisplayPasskey()</primary></indexterm>
-<programlisting>
-DisplayPasskey (IN  o objectpath,
-                IN  u passkey,
-                IN  q entered);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>IN u <parameter>passkey</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>IN q <parameter>entered</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestConfirmation">
-  <title>The RequestConfirmation() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.RequestConfirmation"><primary sortas="org.bluez.Agent1.RequestConfirmation">org.bluez.Agent1.RequestConfirmation()</primary></indexterm>
-<programlisting>
-RequestConfirmation (IN  o bjectpath,
-                     IN  u passkey);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>bjectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>IN u <parameter>passkey</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestAuthorization">
-  <title>The RequestAuthorization() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.RequestAuthorization"><primary sortas="org.bluez.Agent1.RequestAuthorization">org.bluez.Agent1.RequestAuthorization()</primary></indexterm>
-<programlisting>
-RequestAuthorization (IN  o objectpath);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.AuthorizeService">
-  <title>The AuthorizeService() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.AuthorizeService"><primary sortas="org.bluez.Agent1.AuthorizeService">org.bluez.Agent1.AuthorizeService()</primary></indexterm>
-<programlisting>
-AuthorizeService (IN  o objectpath,
-                  IN  s uuid);
-</programlisting>
-<para></para>
-<variablelist role="params">
-<varlistentry>
-  <term><literal>IN o <parameter>objectpath</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-<varlistentry>
-  <term><literal>IN s <parameter>uuid</parameter></literal>:</term>
-  <listitem><para></para></listitem>
-</varlistentry>
-</variablelist>
-</refsect2>
-<refsect2 role="method" id="gdbus-method-org-bluez-Agent1.Cancel">
-  <title>The Cancel() method</title>
-  <indexterm zone="gdbus-method-org-bluez-Agent1.Cancel"><primary sortas="org.bluez.Agent1.Cancel">org.bluez.Agent1.Cancel()</primary></indexterm>
-<programlisting>
-Cancel ();
-</programlisting>
-<para></para>
-</refsect2>
-</refsect1>
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>OUT u
+                            <parameter>passkey</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.DisplayPasskey">
+            <title>The DisplayPasskey() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.DisplayPasskey">
+                <primary sortas="org.bluez.Agent1.DisplayPasskey">org.bluez.Agent1.DisplayPasskey()</primary>
+            </indexterm>
+            <programlisting>
+                DisplayPasskey (IN o objectpath,
+                IN u passkey,
+                IN q entered);
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>IN u
+                            <parameter>passkey</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>IN q
+                            <parameter>entered</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestConfirmation">
+            <title>The RequestConfirmation() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.RequestConfirmation">
+                <primary sortas="org.bluez.Agent1.RequestConfirmation">org.bluez.Agent1.RequestConfirmation()</primary>
+            </indexterm>
+            <programlisting>
+                RequestConfirmation (IN o bjectpath,
+                IN u passkey);
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>bjectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>IN u
+                            <parameter>passkey</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.RequestAuthorization">
+            <title>The RequestAuthorization() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.RequestAuthorization">
+                <primary sortas="org.bluez.Agent1.RequestAuthorization">org.bluez.Agent1.RequestAuthorization()
+                </primary>
+            </indexterm>
+            <programlisting>
+                RequestAuthorization (IN o objectpath);
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.AuthorizeService">
+            <title>The AuthorizeService() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.AuthorizeService">
+                <primary sortas="org.bluez.Agent1.AuthorizeService">org.bluez.Agent1.AuthorizeService()</primary>
+            </indexterm>
+            <programlisting>
+                AuthorizeService (IN o objectpath,
+                IN s uuid);
+            </programlisting>
+            <para></para>
+            <variablelist role="params">
+                <varlistentry>
+                    <term>
+                        <literal>IN o
+                            <parameter>objectpath</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>
+                        <literal>IN s
+                            <parameter>uuid</parameter>
+                        </literal>
+                        :
+                    </term>
+                    <listitem>
+                        <para></para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </refsect2>
+        <refsect2 role="method" id="gdbus-method-org-bluez-Agent1.Cancel">
+            <title>The Cancel() method</title>
+            <indexterm zone="gdbus-method-org-bluez-Agent1.Cancel">
+                <primary sortas="org.bluez.Agent1.Cancel">org.bluez.Agent1.Cancel()</primary>
+            </indexterm>
+            <programlisting>
+                Cancel ();
+            </programlisting>
+            <para></para>
+        </refsect2>
+    </refsect1>
 </refentry>
 
