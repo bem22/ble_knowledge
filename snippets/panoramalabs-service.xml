@@ -34,3 +34,13 @@
         <method name="Cancel" />
     </interface>
 </node>
+
+
+<?ignore
+    gdbus-codegen --interface-prefix com.panoramalabs.
+    --generate-c-code panoramalabs-service
+    --c-namespace Panorama
+    --c-generate-object-manager
+    --generate-docbook panoramalabs-service-generated-docs
+    panoramalabs-service.xml
+?>

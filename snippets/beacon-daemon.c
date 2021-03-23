@@ -164,13 +164,3 @@ main (gint argc, gchar *argv[])
 
     return 0;
 }
-/**
-
-gdbus-codegen --interface-prefix com.panoramalabs. \
-              --generate-c-code panoramalabs-service                        \
-              --c-namespace Panorama                       \
-              --c-generate-object-manager                 \
-              --generate-docbook panoramalabs-service-generated-docs                       \
-              panoramalabs-service.xml
-
-**/
