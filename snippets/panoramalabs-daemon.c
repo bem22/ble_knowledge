@@ -8,7 +8,7 @@ static GDBusObjectManagerServer *manager = NULL;
 static void
 on_bus_acquired(GDBusConnection *connection,
                 const gchar *name,
-                gpointer user_data) {
+                gpointer loop) {
     conn = connection;
     PanoramaObjectSkeleton *object;
     PanoramaOrgBluezAgent1 *agent;
@@ -29,6 +29,7 @@ on_bus_acquired(GDBusConnection *connection,
     g_signal_connect(agent, "handle-request-authorization",
                      G_CALLBACK(on_request_authorization), NULL);
 
+    //autopair_init(loop);
 
     panorama_object_skeleton_set_org_bluez_agent1(object, agent);
 
@@ -102,6 +103,7 @@ main(gint argc, gchar *argv[]) {
                         on_name_lost,
                         loop,
                         NULL);
+    whitelist_init();
 
     g_main_loop_run(loop);
 

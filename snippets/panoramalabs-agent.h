@@ -14,7 +14,15 @@ typedef enum {
 
 extern int agentFilterFlag;
 
-char **whitelisted;
+
+typedef struct whitelisted_devices {
+    int count;
+    gchar** paths;
+} whitelisted_devices;
+
+struct whitelisted_devices whitelisted;
+
+static gchar* device_base_path = "/org/bluezhci0/dev_";
 
 void set_trusted(gchar *path);
 
@@ -29,6 +37,6 @@ int on_request_authorization(PanoramaOrgBluezAgent1 *agent,
                              gchar *path);
 
 int set_agent_filter(PanoramaAgentFilterFlags flag);
-
-int autopair_init ();
+int whitelist_init();
+int autopair_init (gpointer loop);
 #endif //SNIPPETS_PANORAMALABS_AGENT_H

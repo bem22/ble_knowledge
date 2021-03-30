@@ -3,8 +3,12 @@
 //
 #include "panoramalabs-service.h"
 #include "panoramalabs-agent.h"
+#include <stdio.h>
+
 
 int agentFilterFlag= FILTER_NO_FILTER;
+
+GDBusProxy *adapter_proxy;
 
 int set_agent_filter(PanoramaAgentFilterFlags flag) {
     if (flag == FILTER_NO_FILTER || flag == FILTER_SINGLE_DEVICE || flag == FILTER_WHITELIST) {
@@ -56,15 +60,228 @@ int on_request_authorization(PanoramaOrgBluezAgent1 *agent,
 
     return TRUE;
 }
+int check_mac_whitelist(gchar* mac_address) {
+    return 1;
+}
 
-int autopair_init() {
+static void interface_added_callback(GDBusConnection *con,
+                              const gchar *sender,
+                              const gchar *path,
+                              const gchar *interface,
+                              const gchar *signal,
+                              GVariant *params,
+                              void *userdata) {
+    (void)conn;
+    (void)sender;
+    (void)path;
+    (void)interface;
 
-    // TODO: Subscribe to added interfaces
-    // TODO: Start discovery
-    // TODO: Check if added interface is device
-    // TODO: Check if filters are set
-        // TODO (If yes -> Check if the device is in the filter)
-            // TODO (If yes -> Pair)
+    static int exit = 0;
+
+
+    GVariantIter *interfaces;
+    const char *object;
+    const gchar *interface_name;
+    GVariant *properties;
+
+    g_variant_get(params, "(&oa{sa{sv}})", &object, &interfaces);
+    while(g_variant_iter_next(interfaces, "{&s@a{sv}}", &interface_name, &properties)) {
+        if(g_strstr_len(g_ascii_strdown(interface_name, -1), -1, "device")) {
+            g_print("[ %s ]\n", object);
+            const gchar *property_name;
+            GVariantIter i;
+            GVariant *prop_val;
+            g_variant_iter_init(&i, properties);
+            while(g_variant_iter_next(&i, "{&sv}", &property_name, &prop_val))
+                //bluez_property_value(property_name, prop_val);
+            g_variant_unref(prop_val);
+        }
+        g_variant_unref(properties);
+    }
+
+}
+// TODO: Write callback function for verifying added interface
+static void interface_removed_callback(GDBusConnection *con,
+                                       const gchar *sender,
+                                       const gchar *path,
+                                       const gchar *interface,
+                                       const gchar *signal,
+                                       GVariant *params,
+                                       void *userdata) {
+    (void) conn;
+    (void) sender;
+    (void) path;
+    (void) interface;
+
+    static int exit = 0;
+
+
+    //g_print("%s", "Interface removed\n");
+}
+
+int whitelist_init() {
+    // TODO: Open file whitelist.conf
+
+    FILE *fp;
+    char * line = NULL;
+    size_t list_length = 1;
+    size_t len = 0;
+
+    whitelisted.count = 0;
+
+    ssize_t read;
+
+    fp = fopen("../whitelist.conf", "r");
+    if (fp == NULL) {
+        g_print("Missing file \n");
+        return 0;
+    }
+
+
+    // TODO: Init whitelist memory (malloc / !check for alloc errors)
+    whitelisted.paths = (char**) malloc(sizeof(char**));
+
+    if(!whitelisted.paths) {
+        return 0;
+    }
+
+    // TODO: Read line by line
+    // TODO: !! FIND OUT WHY THE LINE IS NOT READ CORRECTLY !! (realloc is a cause - it goes to new wiped memory)
+    while ((read = getline(&line, &len, fp)) != -1) {
+        list_length+= len;
+        whitelisted.paths = (char**) realloc(whitelisted.paths, list_length);
+        whitelisted.paths[whitelisted.count] = line;
+
+        g_print("%s\n", whitelisted.paths[whitelisted.count]);
+
+        whitelisted.count++;
+    }
+
+    for(int i=0; i<whitelisted.count; i++) {
+        g_print("%s !!!!\n", whitelisted.paths[2]);
+    }
+
+
+    // TODO: Extend the list as devices are added (realloc / !check for alloc errors)
+
+    fclose(fp);
+    if (line) {
+        return 0;
+    }
+    free(line);
+
+    return 0;
+}
+
+int adapter_remove_whitelisted_devices() {
+    GError *err = NULL;
+
+    int error_no = 0;
+
+    for(int i=0; i<whitelisted.count; i++) {
+        g_dbus_proxy_call_sync(adapter_proxy,
+                               "RemoveDevice",
+                // TODO: Copy path from whitelist.path to whitelist_base_path
+                               g_variant_new("/org/bluez/hci0/dev_"),
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &err);
+        if(err) {
+            // TODO: Improve error handling here
+            return -1;
+        }
+    }
+
+    return error_no;
+
+}
+
+int autopair_init(gpointer loop) {
+    GError *err = NULL;
+
+    // Adapter setup
+    adapter_proxy = g_dbus_proxy_new_sync(conn,
+                                          G_DBUS_PROXY_FLAGS_NONE,
+                                          NULL,
+                                          "org.bluez",
+                                          "/org/bluez/hci0",
+                                          "org.bluez.Adapter1",
+                                          NULL,
+                                          &err);
+    if(err) {
+        // TODO: Improve error handling here.
+        g_print("Hello");
+        return -1;
+    }
+
+    /**
+     * Pairing strategy for BLE auto-connect to known devices
+     * 1: Stop discovery
+     * TODO: Remove all whitelisted devices from bluetooth's list
+     * 3: Subscribe to interface added signal with connection_signal_subscribe()
+     * 4: Start discovery
+     * TODO: React to added interfaces signals through callback function
+     *     TODO: Check if added interface is device
+     *     TODO: Check if filters are set (e.g whitelist/all/none etc)
+     *     TODO: (If yes -> Check if the device is in whitelist)
+     * TODO: Pair
+     */
+
+    // Stop Discovery
+    g_dbus_proxy_call_sync(adapter_proxy,
+                           "StopDiscovery",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+
+    if(err) {
+        // TODO: Improve error handling here
+        return -1;
+    } else { g_print("StopDiscovery\n");}
+
+    adapter_remove_whitelisted_devices();
+
+    // Subscribe to interfaces added signal
+    guint iface_added = g_dbus_connection_signal_subscribe(conn,
+                                                     "org.bluez",
+                                                     "org.freedesktop.DBus.ObjectManager",
+                                                     "InterfacesAdded",
+                                                     NULL,
+                                                     NULL,
+                                                     G_DBUS_SIGNAL_FLAGS_NONE,
+                                                     interface_added_callback,
+                                                     loop,
+                                                     NULL);
+
+    // Subscribe to interface removed signal
+    guint iface_removed = g_dbus_connection_signal_subscribe(conn,
+                                                       "org.bluez",
+                                                       "org.freedesktop.DBus.ObjectManager",
+                                                       "InterfacesRemoved",
+                                                       NULL,
+                                                       NULL,
+                                                       G_DBUS_SIGNAL_FLAGS_NONE,
+                                                       interface_removed_callback,
+                                                       loop,
+                                                       NULL);
+
+    // Start Discovery
+    g_dbus_proxy_call_sync(adapter_proxy,
+                           "StartDiscovery",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+
+    if(err) {
+        // TODO: Improve error handling here
+        return -1;
+    } else { g_print("StartDiscovery\n");}
+
     return 0;
 }
 
