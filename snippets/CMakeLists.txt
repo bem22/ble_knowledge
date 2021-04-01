@@ -14,7 +14,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 SET(CMAKE_C_FLAGS "-pthread -lrt ${CMAKE_C_FLAGS}")
 
 
-set(SOURCE_FILES panoramalabs-daemon.c panoramalabs-agent.c panoramalabs-agent.h panoramalabs-service.c panoramalabs-service.h)
+set(SOURCE_FILES utils/list_utils.c utils/list_utils.h panoramalabs-daemon.c panoramalabs-agent.c panoramalabs-agent.h panoramalabs-service.c panoramalabs-service.h )
 
 include(FindPkgConfig)
 

@@ -1,6 +1,7 @@
 //
 // Created by bem22 on 10/03/2021.
 //
+#include "utils/list_utils.h"
 #include "panoramalabs-service.h"
 #include "panoramalabs-agent.h"
 #include <stdio.h>
@@ -64,6 +65,7 @@ int check_mac_whitelist(gchar* mac_address) {
     return 1;
 }
 
+// TODO: Write callback function for verifying added interface
 static void interface_added_callback(GDBusConnection *con,
                               const gchar *sender,
                               const gchar *path,
@@ -100,7 +102,6 @@ static void interface_added_callback(GDBusConnection *con,
     }
 
 }
-// TODO: Write callback function for verifying added interface
 static void interface_removed_callback(GDBusConnection *con,
                                        const gchar *sender,
                                        const gchar *path,
@@ -120,18 +121,21 @@ static void interface_removed_callback(GDBusConnection *con,
 }
 
 int whitelist_init() {
-    // TODO: Open file whitelist.conf
 
+    /**
+    * Open file whitelist.conf
+    **/
     FILE *fp;
     char * line = NULL;
-    size_t list_length = 1;
     size_t len = 0;
 
     whitelisted.count = 0;
 
-    ssize_t read;
+    init_list(&l);
+    l.length = 0;
 
     fp = fopen("../whitelist.conf", "r");
+
     if (fp == NULL) {
         g_print("Missing file \n");
         return 0;
@@ -147,28 +151,27 @@ int whitelist_init() {
 
     // TODO: Read line by line
     // TODO: !! FIND OUT WHY THE LINE IS NOT READ CORRECTLY !! (realloc is a cause - it goes to new wiped memory)
-    while ((read = getline(&line, &len, fp)) != -1) {
-        list_length+= len;
-        whitelisted.paths = (char**) realloc(whitelisted.paths, list_length);
-        whitelisted.paths[whitelisted.count] = line;
 
-        g_print("%s\n", whitelisted.paths[whitelisted.count]);
+    while ((getline(&line, &len, fp)) != -1) {
 
-        whitelisted.count++;
+        Node *n = (Node*) malloc(sizeof(Node));
+
+        n->string = malloc(18);
+        n->string[17] = '\0';
+
+        n->length = 18;
+        memcpy(n->string, line, n->length-1);
+
+        push(&l, n);
+        free(line);
+        line = NULL;
     }
-
-    for(int i=0; i<whitelisted.count; i++) {
-        g_print("%s !!!!\n", whitelisted.paths[2]);
-    }
-
-
-    // TODO: Extend the list as devices are added (realloc / !check for alloc errors)
 
     fclose(fp);
-    if (line) {
-        return 0;
+
+    if(line) {
+        free(line);
     }
-    free(line);
 
     return 0;
 }
@@ -179,7 +182,7 @@ int adapter_remove_whitelisted_devices() {
     int error_no = 0;
 
     for(int i=0; i<whitelisted.count; i++) {
-        g_dbus_proxy_call_sync(adapter_proxy,
+        /* g_dbus_proxy_call_sync(adapter_proxy,
                                "RemoveDevice",
                 // TODO: Copy path from whitelist.path to whitelist_base_path
                                g_variant_new("/org/bluez/hci0/dev_"),
@@ -191,6 +194,11 @@ int adapter_remove_whitelisted_devices() {
             // TODO: Improve error handling here
             return -1;
         }
+         */
+
+    }
+    for(int i=0; i<3; i++) {
+        g_print("%s", pop(&l, i)->string);
     }
 
     return error_no;
@@ -199,6 +207,8 @@ int adapter_remove_whitelisted_devices() {
 
 int autopair_init(gpointer loop) {
     GError *err = NULL;
+
+    whitelist_init();
 
     // Adapter setup
     adapter_proxy = g_dbus_proxy_new_sync(conn,
@@ -228,7 +238,7 @@ int autopair_init(gpointer loop) {
      * TODO: Pair
      */
 
-    // Stop Discovery
+    /* Stop Discovery
     g_dbus_proxy_call_sync(adapter_proxy,
                            "StopDiscovery",
                            NULL,
@@ -239,9 +249,11 @@ int autopair_init(gpointer loop) {
 
     if(err) {
         // TODO: Improve error handling here
+
+        g_print("%s", err->message);
         return -1;
     } else { g_print("StopDiscovery\n");}
-
+    */
     adapter_remove_whitelisted_devices();
 
     // Subscribe to interfaces added signal
@@ -279,9 +291,10 @@ int autopair_init(gpointer loop) {
 
     if(err) {
         // TODO: Improve error handling here
+
+        g_print("%s", err->message);
         return -1;
     } else { g_print("StartDiscovery\n");}
 
     return 0;
 }
-

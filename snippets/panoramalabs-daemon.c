@@ -16,6 +16,7 @@ on_bus_acquired(GDBusConnection *connection,
 
     g_print("Acquired a message bus connection\n");
 
+    autopair_init(loop);
 
     manager = g_dbus_object_manager_server_new("/");
 
@@ -103,7 +104,7 @@ main(gint argc, gchar *argv[]) {
                         on_name_lost,
                         loop,
                         NULL);
-    whitelist_init();
+
 
     g_main_loop_run(loop);
 
