@@ -48,6 +48,7 @@ int push(list *list, Node *n)
 
     // Now make the list point to the head
     list->node = n;
+    list->length++;
 
     return 0;
 }
@@ -86,6 +87,8 @@ int remove_element(list *list, unsigned int index)
             free(head);
             head = NULL;
 
+            list->length--;
+
             // Return success
             return 0;
         }
@@ -98,6 +101,7 @@ int remove_element(list *list, unsigned int index)
 void init_list(list *list)
 {
     list->node = NULL;
+    list->length = 0;
 }
 
 void destroy_node(Node *n) {

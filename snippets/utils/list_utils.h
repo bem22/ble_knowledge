@@ -8,7 +8,7 @@
 // --- Data structures ---
 typedef struct Node
 {
-    unsigned int length;
+    unsigned int string_length;
     char *string;
     struct Node *next;
 } Node;
@@ -18,6 +18,7 @@ typedef struct list
     struct Node *node;
     int length;
 } list;
+
 
 static list l;
 

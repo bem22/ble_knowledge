@@ -129,10 +129,7 @@ int whitelist_init() {
     char * line = NULL;
     size_t len = 0;
 
-    whitelisted.count = 0;
-
     init_list(&l);
-    l.length = 0;
 
     fp = fopen("../whitelist.conf", "r");
 
@@ -142,26 +139,38 @@ int whitelist_init() {
     }
 
 
-    // TODO: Init whitelist memory (malloc / !check for alloc errors)
-    whitelisted.paths = (char**) malloc(sizeof(char**));
+    /**
+     * 1. Read line by line
+     * 2. Allocate mem resources for nodes and strings
+     * 3. Check for errors and transform ':' into '_'
+     * 4. Push nodes to list
+    **/
 
-    if(!whitelisted.paths) {
-        return 0;
-    }
+     while ((getline(&line, &len, fp)) != -1) {
 
-    // TODO: Read line by line
-    // TODO: !! FIND OUT WHY THE LINE IS NOT READ CORRECTLY !! (realloc is a cause - it goes to new wiped memory)
-
-    while ((getline(&line, &len, fp)) != -1) {
-
+        // Initialize node
         Node *n = (Node*) malloc(sizeof(Node));
+        if(!n) { printf("%s", "Failed to malloc"); return -1; }
 
+        // Initialize string inside node
         n->string = malloc(18);
+        if(!n->string) { printf("%s", "Failed to malloc!"); return -1; }
+
+        // Set final character
         n->string[17] = '\0';
 
-        n->length = 18;
-        memcpy(n->string, line, n->length-1);
+        // Set string string_length (including \0)
+        n->string_length = 18;
 
+
+        // Replaces MAC address separators with '_' to match bluez spec
+            // 95 is '_' in ASCII
+        g_strcanon(line, "ABCDEF0123456789_", 95);
+
+        // Copy the line
+        memcpy(n->string, line, n->string_length - 1);
+
+        // Finally, push the node to the list
         push(&l, n);
         free(line);
         line = NULL;
@@ -181,8 +190,31 @@ int adapter_remove_whitelisted_devices() {
 
     int error_no = 0;
 
+
+    for(int i=0; i<l.length; i++) {
+        g_print("%s\n", g_strconcat("/org/bluez/hci0/dev_", pop(&l, i)->string, NULL));
+
+        g_dbus_proxy_call_sync(adapter_proxy,
+                               "RemoveDevice",
+                                // TODO: Concat path from whitelist.path to whitelist_base_path
+                               g_variant_new("(o)", g_strconcat("/org/bluez/hci0/dev_", pop(&l, i)->string, NULL)),
+                               G_DBUS_CALL_FLAGS_NONE,
+                               -1,
+                               NULL,
+                               &err);
+
+
+
+        if(err) {
+            g_print("%s\n", err->message);
+            // TODO: Improve error handling here
+        }
+        err = NULL;
+
+
+    }
     for(int i=0; i<whitelisted.count; i++) {
-        /* g_dbus_proxy_call_sync(adapter_proxy,
+        g_dbus_proxy_call_sync(adapter_proxy,
                                "RemoveDevice",
                 // TODO: Copy path from whitelist.path to whitelist_base_path
                                g_variant_new("/org/bluez/hci0/dev_"),
@@ -194,11 +226,8 @@ int adapter_remove_whitelisted_devices() {
             // TODO: Improve error handling here
             return -1;
         }
-         */
 
-    }
-    for(int i=0; i<3; i++) {
-        g_print("%s", pop(&l, i)->string);
+
     }
 
     return error_no;
@@ -288,6 +317,8 @@ int autopair_init(gpointer loop) {
                            -1,
                            NULL,
                            &err);
+
+
 
     if(err) {
         // TODO: Improve error handling here
