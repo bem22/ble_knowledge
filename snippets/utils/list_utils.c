@@ -5,9 +5,29 @@
 #include "list_utils.h"
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+Node *get_from_MAC(list *list, char* mac_addr) {
+    struct Node *head = list->node;
+
+    // Cut down index until reaching the desired position
+    while (head)
+    {
+        if (strcmp(head->mac_addr, mac_addr) != 0)
+        {
+            head = head->next;
+        } else if(strcmp(head->mac_addr, mac_addr) == 0){
+            return head;
+        }
+    }
+
+    // If you are here, the node does not exist
+    return NULL;
+}
 
 // These functions serve the custom linked list
-Node *pop(list *list, unsigned int index)
+Node *get_from_index(list *list, unsigned int index)
 {
     struct Node *head = list->node;
 
@@ -82,8 +102,8 @@ int remove_element(list *list, unsigned int index)
                 list->node = head->next;
             }
             // Free memory, assign NULL pointer
-            free(head->string);
-            head->string = NULL;
+            free(head->mac_addr);
+            head->mac_addr = NULL;
             free(head);
             head = NULL;
 
@@ -98,6 +118,24 @@ int remove_element(list *list, unsigned int index)
     return -1;
 }
 
+int is_in_list(list* list, char* object_path) {
+    struct Node *previous;
+    struct Node *head;
+
+    previous = NULL;
+    head = list->node;
+
+    while(head) {
+        if(strcmp(head->mac_addr, object_path) == 0) {
+            printf("hello!\n");
+            return 1;
+        }
+    }
+
+    return 0;
+
+}
+
 void init_list(list *list)
 {
     list->node = NULL;
@@ -107,8 +145,8 @@ void init_list(list *list)
 void destroy_node(Node *n) {
     if(n) {
         destroy_node(n->next);
-        free(n->string);
-        n->string = NULL;
+        free(n->mac_addr);
+        n->mac_addr = NULL;
         free(n);
         n = NULL;
     }

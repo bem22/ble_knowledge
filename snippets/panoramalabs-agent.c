@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 
-int agentFilterFlag= FILTER_NO_FILTER;
+int agentFilterFlag= FILTER_WHITELIST;
 
 GDBusProxy *adapter_proxy;
 
@@ -30,7 +30,7 @@ void set_trusted(gchar *path) {
                                                   &err);
     if (!err) { g_print("proxy\n"); }
 
-    g_dbus_proxy_call_sync(dev_proxy,
+    /**g_dbus_proxy_call_sync(dev_proxy,
                            "Set",
                            g_variant_new("(ssv)", "org.bluez.Device1", "Trusted", g_variant_new_boolean(TRUE)),
                            G_DBUS_CALL_FLAGS_NONE,
@@ -39,6 +39,7 @@ void set_trusted(gchar *path) {
                            &err);
     if (!err) { g_print("Trusted!\n"); }
     else { g_print("%s", err->message); }
+    **/
 
     g_object_unref(dev_proxy);
 }
@@ -56,14 +57,18 @@ int on_request_confirmation(PanoramaOrgBluezAgent1 *agent,
 int on_request_authorization(PanoramaOrgBluezAgent1 *agent,
                              GDBusMethodInvocation *invocation,
                              gchar *path) {
-    g_print("Device path : %s", path);
+    g_print("Device path : %s\n", path);
     set_trusted(path);
+
+    panorama_org_bluez_agent1_complete_request_authorization(agent, invocation);
 
     return TRUE;
 }
-int check_mac_whitelist(gchar* mac_address) {
-    return 1;
+
+static void pair_async_cb() {
+    g_print("ready to pair");
 }
+
 
 // TODO: Write callback function for verifying added interface
 static void interface_added_callback(GDBusConnection *con,
@@ -85,23 +90,45 @@ static void interface_added_callback(GDBusConnection *con,
     const char *object;
     const gchar *interface_name;
     GVariant *properties;
+    Node* device_node;
+    GError *err = NULL;
 
+    // Get all new interfaces
     g_variant_get(params, "(&oa{sa{sv}})", &object, &interfaces);
-    while(g_variant_iter_next(interfaces, "{&s@a{sv}}", &interface_name, &properties)) {
-        if(g_strstr_len(g_ascii_strdown(interface_name, -1), -1, "device")) {
-            g_print("[ %s ]\n", object);
-            const gchar *property_name;
-            GVariantIter i;
-            GVariant *prop_val;
-            g_variant_iter_init(&i, properties);
-            while(g_variant_iter_next(&i, "{&sv}", &property_name, &prop_val))
-                //bluez_property_value(property_name, prop_val);
-            g_variant_unref(prop_val);
+
+    if(agentFilterFlag == FILTER_WHITELIST) {
+        for (int i = 0; i < l.length; i++) {
+            device_node = get_from_index(&l, i);
+            if (strstr(object, device_node->mac_addr) && strlen(object) < 38 && !device_node->paired) {
+                g_print("Found: %s whitelisted\n", object);
+
+                // Upon discovery create device proxies and reference to the list
+                device_node->device_proxy = g_dbus_proxy_new_sync(conn,
+                                                             G_DBUS_PROXY_FLAGS_NONE,
+                                                             NULL,
+                                                             "org.bluez",
+                                                             object,
+                                                             "org.bluez.Device1",
+                                                             NULL,
+                                                             &err);
+                if(err) {
+                    g_print("%s\n", err->message);
+                    return;
+                }
+
+                device_node->paired = 1;
+
+                // If PROPERTY(Paired+Trusted) == FALSE -> Call Pair
+
+                g_dbus_proxy_call_sync(device_node->device_proxy, "Pair",
+                                       NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &err);
+
+            }
         }
-        g_variant_unref(properties);
     }
 
 }
+
 static void interface_removed_callback(GDBusConnection *con,
                                        const gchar *sender,
                                        const gchar *path,
@@ -117,7 +144,7 @@ static void interface_removed_callback(GDBusConnection *con,
     static int exit = 0;
 
 
-    //g_print("%s", "Interface removed\n");
+    g_print("%s", "Interface removed\n");
 }
 
 int whitelist_init() {
@@ -153,14 +180,15 @@ int whitelist_init() {
         if(!n) { printf("%s", "Failed to malloc"); return -1; }
 
         // Initialize string inside node
-        n->string = malloc(18);
-        if(!n->string) { printf("%s", "Failed to malloc!"); return -1; }
+        n->mac_addr = malloc(18);
+        if(!n->mac_addr) { printf("%s", "Failed to malloc!"); return -1; }
 
         // Set final character
-        n->string[17] = '\0';
+        n->mac_addr[17] = '\0';
 
         // Set string string_length (including \0)
         n->string_length = 18;
+        n->paired = 0;
 
 
         // Replaces MAC address separators with '_' to match bluez spec
@@ -168,7 +196,7 @@ int whitelist_init() {
         g_strcanon(line, "ABCDEF0123456789_", 95);
 
         // Copy the line
-        memcpy(n->string, line, n->string_length - 1);
+        memcpy(n->mac_addr, line, n->string_length - 1);
 
         // Finally, push the node to the list
         push(&l, n);
@@ -188,22 +216,35 @@ int whitelist_init() {
 int adapter_remove_whitelisted_devices() {
     GError *err = NULL;
 
+    // Stop discovery
+    g_dbus_proxy_call_sync(adapter_proxy,
+                           "StopDiscovery",
+                           NULL,
+                           G_DBUS_CALL_FLAGS_NONE,
+                           -1,
+                           NULL,
+                           &err);
+
+    if(err) {
+        // TODO: Improve error handling here
+
+        g_print("%s\n", err->message);
+    } else { g_print("StopDiscovery\n");}
+
+    err = NULL;
     int error_no = 0;
 
 
     for(int i=0; i<l.length; i++) {
-        g_print("%s\n", g_strconcat("/org/bluez/hci0/dev_", pop(&l, i)->string, NULL));
+        g_print("%s\n", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL));
 
         g_dbus_proxy_call_sync(adapter_proxy,
                                "RemoveDevice",
-                                // TODO: Concat path from whitelist.path to whitelist_base_path
-                               g_variant_new("(o)", g_strconcat("/org/bluez/hci0/dev_", pop(&l, i)->string, NULL)),
+                               g_variant_new("(o)", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL)),
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
                                &err);
-
-
 
         if(err) {
             g_print("%s\n", err->message);
@@ -213,25 +254,8 @@ int adapter_remove_whitelisted_devices() {
 
 
     }
-    for(int i=0; i<whitelisted.count; i++) {
-        g_dbus_proxy_call_sync(adapter_proxy,
-                               "RemoveDevice",
-                // TODO: Copy path from whitelist.path to whitelist_base_path
-                               g_variant_new("/org/bluez/hci0/dev_"),
-                               G_DBUS_CALL_FLAGS_NONE,
-                               -1,
-                               NULL,
-                               &err);
-        if(err) {
-            // TODO: Improve error handling here
-            return -1;
-        }
-
-
-    }
 
     return error_no;
-
 }
 
 int autopair_init(gpointer loop) {
@@ -257,32 +281,16 @@ int autopair_init(gpointer loop) {
     /**
      * Pairing strategy for BLE auto-connect to known devices
      * 1: Stop discovery
-     * TODO: Remove all whitelisted devices from bluetooth's list
+     * 2: Remove all whitelisted devices from bluetooth's list
      * 3: Subscribe to interface added signal with connection_signal_subscribe()
      * 4: Start discovery
      * TODO: React to added interfaces signals through callback function
-     *     TODO: Check if added interface is device
+     *     a) Check if added interface is device
      *     TODO: Check if filters are set (e.g whitelist/all/none etc)
-     *     TODO: (If yes -> Check if the device is in whitelist)
+     *     c) (If yes -> Check if the device is in whitelist)
      * TODO: Pair
      */
 
-    /* Stop Discovery
-    g_dbus_proxy_call_sync(adapter_proxy,
-                           "StopDiscovery",
-                           NULL,
-                           G_DBUS_CALL_FLAGS_NONE,
-                           -1,
-                           NULL,
-                           &err);
-
-    if(err) {
-        // TODO: Improve error handling here
-
-        g_print("%s", err->message);
-        return -1;
-    } else { g_print("StopDiscovery\n");}
-    */
     adapter_remove_whitelisted_devices();
 
     // Subscribe to interfaces added signal

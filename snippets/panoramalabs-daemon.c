@@ -16,7 +16,6 @@ on_bus_acquired(GDBusConnection *connection,
 
     g_print("Acquired a message bus connection\n");
 
-    autopair_init(loop);
 
     manager = g_dbus_object_manager_server_new("/");
 
@@ -30,7 +29,7 @@ on_bus_acquired(GDBusConnection *connection,
     g_signal_connect(agent, "handle-request-authorization",
                      G_CALLBACK(on_request_authorization), NULL);
 
-    //autopair_init(loop);
+    autopair_init(loop);
 
     panorama_object_skeleton_set_org_bluez_agent1(object, agent);
 
