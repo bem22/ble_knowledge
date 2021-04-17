@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../debug/debug.h"
 
 Node *get_from_MAC(list *list, char* mac_addr) {
     struct Node *head = list->node;
@@ -44,6 +45,7 @@ Node *get_from_index(list *list, unsigned int index)
             return head;
         }
     }
+
 
     // If you are here, the node does not exist
     return NULL;

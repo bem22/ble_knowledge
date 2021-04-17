@@ -4,6 +4,7 @@
 #include "utils/list_utils.h"
 #include "panoramalabs-service.h"
 #include "panoramalabs-agent.h"
+#include "debug/debug.h"
 #include <stdio.h>
 
 
@@ -19,6 +20,7 @@ int set_agent_filter(PanoramaAgentFilterFlags flag) {
 }
 
 void set_trusted(gchar *path) {
+    time_t start = tick();
     GError *err = NULL;
     GDBusProxy *dev_proxy = g_dbus_proxy_new_sync(conn,
                                                   G_DBUS_PROXY_FLAGS_NONE,
@@ -28,20 +30,13 @@ void set_trusted(gchar *path) {
                                                   "org.freedesktop.DBus.Properties",
                                                   NULL,
                                                   &err);
-    if (!err) { g_print("proxy\n"); }
+    if (err) { g_print("%s\n", err->message); }
+    else { g_print("Trusted!\n"); }
 
-    /**g_dbus_proxy_call_sync(dev_proxy,
-                           "Set",
-                           g_variant_new("(ssv)", "org.bluez.Device1", "Trusted", g_variant_new_boolean(TRUE)),
-                           G_DBUS_CALL_FLAGS_NONE,
-                           -1,
-                           NULL,
-                           &err);
-    if (!err) { g_print("Trusted!\n"); }
-    else { g_print("%s", err->message); }
-    **/
+
 
     g_object_unref(dev_proxy);
+    tock(start);
 }
 
 int on_request_confirmation(PanoramaOrgBluezAgent1 *agent,
@@ -65,12 +60,58 @@ int on_request_authorization(PanoramaOrgBluezAgent1 *agent,
     return TRUE;
 }
 
-static void pair_async_cb() {
-    g_print("ready to pair");
+void pair_async_cb(GDBusProxy *p,
+                          GAsyncResult *res,
+                          gpointer data) {
+    GError *err = NULL;
+    g_dbus_proxy_call_finish(p, res, &err);
+
+    gchar *string = (gchar *) data;
+
+    g_print("%s Connected\n", string);
+
+    if(err) {
+        g_print("%s", err->message);
+    }
+    char* chars = g_strconcat(string, "/service0034/char0035", NULL);
+    g_print("%s\n", chars);
+
+
+    err = NULL;
+    GDBusProxy *blinker = g_dbus_proxy_new_sync(conn,
+                                                G_DBUS_PROXY_FLAGS_NONE,
+                                                NULL, "org.bluez",
+                                                chars,
+                                                "org.bluez.GattCharacteristic1",
+                                                NULL,
+                                                &err);
+
+    if(!err) {
+
+        err = NULL;
+        g_dbus_proxy_call_sync(blinker, "WriteValue", g_variant_new("(ay{})",g_variant_new_byte(1), NULL), G_DBUS_CALL_FLAGS_NONE, -1, NULL, &err);
+
+        if(err) {
+            g_print("%s", err->message);
+        }
+    }
+
+    free(chars);
+
+}
+
+void remove_device_async_cb(GDBusProxy *p,
+                            GAsyncResult *res,
+                            gpointer data) {
+    GError *err = NULL;
+    g_dbus_proxy_call_finish(p, res, &err);
+    if(err) {
+        g_print("%s", err->message);
+    }
 }
 
 
-// TODO: Write callback function for verifying added interface
+// Callback function for verifying added interface
 static void interface_added_callback(GDBusConnection *con,
                               const gchar *sender,
                               const gchar *path,
@@ -82,6 +123,8 @@ static void interface_added_callback(GDBusConnection *con,
     (void)sender;
     (void)path;
     (void)interface;
+
+    time_t start = clock();
 
     static int exit = 0;
 
@@ -104,14 +147,14 @@ static void interface_added_callback(GDBusConnection *con,
 
                 // Upon discovery create device proxies and reference to the list
                 device_node->device_proxy = g_dbus_proxy_new_sync(conn,
-                                                             G_DBUS_PROXY_FLAGS_NONE,
-                                                             NULL,
-                                                             "org.bluez",
-                                                             object,
-                                                             "org.bluez.Device1",
-                                                             NULL,
-                                                             &err);
-                if(err) {
+                                                                  G_DBUS_PROXY_FLAGS_NONE,
+                                                                  NULL,
+                                                                  "org.bluez",
+                                                                  object,
+                                                                  "org.bluez.Device1",
+                                                                  NULL,
+                                                                  &err);
+                if (err) {
                     g_print("%s\n", err->message);
                     return;
                 }
@@ -120,13 +163,13 @@ static void interface_added_callback(GDBusConnection *con,
 
                 // If PROPERTY(Paired+Trusted) == FALSE -> Call Pair
 
-                g_dbus_proxy_call_sync(device_node->device_proxy, "Pair",
-                                       NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &err);
+                g_dbus_proxy_call(device_node->device_proxy, "Connect",
+                                  NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, (GAsyncReadyCallback) pair_async_cb, object);
+
 
             }
         }
     }
-
 }
 
 static void interface_removed_callback(GDBusConnection *con,
@@ -238,13 +281,14 @@ int adapter_remove_whitelisted_devices() {
     for(int i=0; i<l.length; i++) {
         g_print("%s\n", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL));
 
-        g_dbus_proxy_call_sync(adapter_proxy,
+        g_dbus_proxy_call(adapter_proxy,
                                "RemoveDevice",
                                g_variant_new("(o)", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL)),
                                G_DBUS_CALL_FLAGS_NONE,
                                -1,
                                NULL,
-                               &err);
+                                (GAsyncReadyCallback) remove_device_async_cb,
+                               NULL);
 
         if(err) {
             g_print("%s\n", err->message);
