@@ -16,7 +16,6 @@ on_bus_acquired(GDBusConnection *connection,
 
     g_print("Acquired a message bus connection\n");
 
-
     manager = g_dbus_object_manager_server_new("/");
 
     gchar *s = "/com/panoramalabs/Agent1";

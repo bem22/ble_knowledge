@@ -66,34 +66,60 @@ void pair_async_cb(GDBusProxy *p,
     GError *err = NULL;
     g_dbus_proxy_call_finish(p, res, &err);
 
+
     gchar *string = (gchar *) data;
 
     g_print("%s Connected\n", string);
 
     if(err) {
-        g_print("%s", err->message);
+        g_print("%s\n", err->message);
+        return;
     }
-    char* chars = g_strconcat(string, "/service0034/char0035", NULL);
-    g_print("%s\n", chars);
+    char* chars = g_strconcat(string, "/service0038/char0039", NULL);
+    //g_print("%s\n", chars);
 
 
     err = NULL;
-    GDBusProxy *blinker = g_dbus_proxy_new_sync(conn,
-                                                G_DBUS_PROXY_FLAGS_NONE,
-                                                NULL, "org.bluez",
-                                                chars,
-                                                "org.bluez.GattCharacteristic1",
-                                                NULL,
-                                                &err);
+    GDBusProxy *gatt_proxy = g_dbus_proxy_new_sync(conn,
+                                                   G_DBUS_PROXY_FLAGS_NONE,
+                                                   NULL,
+                                                   "org.bluez",
+                                                   chars,
+                                                   "org.bluez.GattCharacteristic1",
+                                                   NULL,
+                                                   &err);
+    if(err != NULL) {
+        g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
+        return;
+    } else {
+        //g_print("\n%s\n", "Proxy created successfully!");
+    }
 
-    if(!err) {
+    for(int i=0; i<15; i++) {
+        GVariantBuilder builder;
+        g_variant_builder_init (&builder, G_VARIANT_TYPE("a{sv}"));
+        GVariant *argument = g_variant_builder_end(&builder);
 
-        err = NULL;
-        g_dbus_proxy_call_sync(blinker, "WriteValue", g_variant_new("(ay{})",g_variant_new_byte(1), NULL), G_DBUS_CALL_FLAGS_NONE, -1, NULL, &err);
+        char* blnk = "1";
+        if(i%2==0) {
+            blnk = "";
+        } else {blnk = "1";}
+        GVariant *char_value = g_variant_new_from_data(G_VARIANT_TYPE("ay"), blnk, 1, TRUE, NULL, NULL);
 
-        if(err) {
-            g_print("%s", err->message);
+
+        g_dbus_proxy_call_sync(gatt_proxy,
+                                                  "WriteValue",
+                                                  g_variant_new("(@ay@a{sv})", char_value, argument),
+                                                  G_DBUS_CALL_FLAGS_NONE,
+                                                  -1,
+                                                  NULL,
+                                                  &err);
+        if(err != NULL) {
+            g_print("%s\n%s\n", "Error while calling a method through proxy", err->message);
+            return;
         }
+
+        usleep(100);
     }
 
     free(chars);
@@ -106,7 +132,7 @@ void remove_device_async_cb(GDBusProxy *p,
     GError *err = NULL;
     g_dbus_proxy_call_finish(p, res, &err);
     if(err) {
-        g_print("%s", err->message);
+        //g_print("%s", err->message);
     }
 }
 
@@ -142,6 +168,8 @@ static void interface_added_callback(GDBusConnection *con,
     if(agentFilterFlag == FILTER_WHITELIST) {
         for (int i = 0; i < l.length; i++) {
             device_node = get_from_index(&l, i);
+
+
             if (strstr(object, device_node->mac_addr) && strlen(object) < 38 && !device_node->paired) {
                 g_print("Found: %s whitelisted\n", object);
 
@@ -163,7 +191,7 @@ static void interface_added_callback(GDBusConnection *con,
 
                 // If PROPERTY(Paired+Trusted) == FALSE -> Call Pair
 
-                g_dbus_proxy_call(device_node->device_proxy, "Connect",
+                g_dbus_proxy_call(device_node->device_proxy, "Pair",
                                   NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, (GAsyncReadyCallback) pair_async_cb, object);
 
 
@@ -187,7 +215,7 @@ static void interface_removed_callback(GDBusConnection *con,
     static int exit = 0;
 
 
-    g_print("%s", "Interface removed\n");
+    //g_print("%s", "Interface removed\n");
 }
 
 int whitelist_init() {
@@ -271,7 +299,7 @@ int adapter_remove_whitelisted_devices() {
     if(err) {
         // TODO: Improve error handling here
 
-        g_print("%s\n", err->message);
+        //g_print("%s\n", err->message);
     } else { g_print("StopDiscovery\n");}
 
     err = NULL;
@@ -323,7 +351,7 @@ int autopair_init(gpointer loop) {
     }
 
     /**
-     * Pairing strategy for BLE auto-connect to known devices
+     * Pairing strategy for BLE auto-connect to known devices:
      * 1: Stop discovery
      * 2: Remove all whitelisted devices from bluetooth's list
      * 3: Subscribe to interface added signal with connection_signal_subscribe()
@@ -375,7 +403,7 @@ int autopair_init(gpointer loop) {
     if(err) {
         // TODO: Improve error handling here
 
-        g_print("%s", err->message);
+        g_print("%s\n", err->message);
         return -1;
     } else { g_print("StartDiscovery\n");}
 
