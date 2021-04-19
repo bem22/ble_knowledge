@@ -45,6 +45,7 @@ int on_request_confirmation(PanoramaOrgBluezAgent1 *agent,
                             guint32 passkey,
                             gpointer userdata) {
     g_print("Hello WORLD!");
+    panorama_org_bluez_agent1_complete_request_confirmation(agent, invocation);
     set_trusted(path);
     return TRUE;
 }
