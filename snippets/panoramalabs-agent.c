@@ -70,15 +70,16 @@ void pair_async_cb(GDBusProxy *p,
 
     gchar *string = (gchar *) data;
 
-    g_print("%s Connected\n", string);
 
     if(err) {
         g_print("%s\n", err->message);
         return;
     }
-    char* chars = g_strconcat(string, "/service0038/char0039", NULL);
-    //g_print("%s\n", chars);
 
+
+    g_print("%s Connected\n", string);
+
+    char* chars = g_strconcat(string, "/service0038/char0039", NULL);
 
     err = NULL;
     GDBusProxy *gatt_proxy = g_dbus_proxy_new_sync(conn,
@@ -92,9 +93,9 @@ void pair_async_cb(GDBusProxy *p,
     if(err != NULL) {
         g_print("%s\n%s\n", "Error while attempting to create a proxy", err->message);
         return;
-    } else {
-        //g_print("\n%s\n", "Proxy created successfully!");
     }
+
+    /** Blink **/
 
     for(int i=0; i<15; i++) {
         GVariantBuilder builder;
@@ -120,8 +121,11 @@ void pair_async_cb(GDBusProxy *p,
             return;
         }
 
-        usleep(100);
+        usleep(50);
     }
+
+
+    /** End of Blink **/
 
     free(chars);
 
@@ -158,8 +162,6 @@ static void interface_added_callback(GDBusConnection *con,
 
     GVariantIter *interfaces;
     const char *object;
-    const gchar *interface_name;
-    GVariant *properties;
     Node* device_node;
     GError *err = NULL;
 
@@ -195,7 +197,6 @@ static void interface_added_callback(GDBusConnection *con,
                 g_dbus_proxy_call(device_node->device_proxy, "Pair",
                                   NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, (GAsyncReadyCallback) pair_async_cb, object);
 
-
             }
         }
     }
@@ -215,8 +216,39 @@ static void interface_removed_callback(GDBusConnection *con,
 
     static int exit = 0;
 
+    const char *object;
 
-    //g_print("%s", "Interface removed\n");
+    // Get all removed
+
+    GVariantIter *interfaces;
+    g_variant_get(params, "(&oas)", &object, &interfaces);
+    Node *device_node;
+    GError *err = NULL;
+
+    for (int i = 0; i < l.length; i++) {
+        device_node = get_from_index(&l, i);
+
+        if (strstr(object, device_node->mac_addr) && strlen(object) < 38 && device_node->paired) {
+
+            device_node->paired = 0;
+            g_dbus_proxy_call(adapter_proxy,
+                              "RemoveDevice",
+                              g_variant_new("(o)", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL)),
+                              G_DBUS_CALL_FLAGS_NONE,
+                              -1,
+                              NULL,
+                              (GAsyncReadyCallback) remove_device_async_cb,
+                              NULL);
+
+            if(err) {
+                g_print("%s\n", err->message);
+                // TODO: Improve error handling here
+            } else {
+                g_print("Whitelisted device removed: %s\n", object);
+            }
+
+        }
+    }
 }
 
 int whitelist_init() {
@@ -234,7 +266,7 @@ int whitelist_init() {
 
     if (fp == NULL) {
         g_print("Missing file \n");
-        return 0;
+        return -1;
     }
 
 
@@ -297,18 +329,14 @@ int adapter_remove_whitelisted_devices() {
                            NULL,
                            &err);
 
-    if(err) {
-        // TODO: Improve error handling here
-
-        //g_print("%s\n", err->message);
-    } else { g_print("StopDiscovery\n");}
-
-    err = NULL;
-    int error_no = 0;
+    if(err && err->code != 36) {
+        g_print("%s\n", err->message);
+        return -1;
+    }
 
 
     for(int i=0; i<l.length; i++) {
-        g_print("%s\n", g_strconcat("/org/bluez/hci0/dev_", get_from_index(&l, i)->mac_addr, NULL));
+        err = NULL;
 
         g_dbus_proxy_call(adapter_proxy,
                                "RemoveDevice",
@@ -321,20 +349,19 @@ int adapter_remove_whitelisted_devices() {
 
         if(err) {
             g_print("%s\n", err->message);
-            // TODO: Improve error handling here
         }
-        err = NULL;
-
-
     }
 
-    return error_no;
+    return 0;
 }
 
 int autopair_init(gpointer loop) {
     GError *err = NULL;
 
-    whitelist_init();
+    // Load whitelist into RAM in list
+    if(whitelist_init()) {
+       return -1;
+    }
 
     // Adapter setup
     adapter_proxy = g_dbus_proxy_new_sync(conn,
@@ -345,9 +372,9 @@ int autopair_init(gpointer loop) {
                                           "org.bluez.Adapter1",
                                           NULL,
                                           &err);
+
     if(err) {
-        // TODO: Improve error handling here.
-        g_print("Hello");
+        g_print("Failed to create a proxy for Adapter 1: %s", err->message);
         return -1;
     }
 
@@ -357,11 +384,13 @@ int autopair_init(gpointer loop) {
      * 2: Remove all whitelisted devices from bluetooth's list
      * 3: Subscribe to interface added signal with connection_signal_subscribe()
      * 4: Start discovery
-     * TODO: React to added interfaces signals through callback function
+     * 5: React to added interfaces signals through callback function
      *     a) Check if added interface is device
-     *     TODO: Check if filters are set (e.g whitelist/all/none etc)
-     *     c) (If yes -> Check if the device is in whitelist)
-     * TODO: Pair
+     *     b) Check if filters are set (e.g whitelist/all/none etc)
+     *        x. If yes -> Check if the device is in whitelist)
+     *          1) If yes Pair
+     *          2) If not, Ignore
+     *        y. If not, ignore
      */
 
     adapter_remove_whitelisted_devices();
@@ -399,14 +428,10 @@ int autopair_init(gpointer loop) {
                            NULL,
                            &err);
 
-
-
     if(err) {
-        // TODO: Improve error handling here
-
-        g_print("%s\n", err->message);
+         g_print("%s\n", err->message);
         return -1;
-    } else { g_print("StartDiscovery\n");}
+    }
 
-    return 0;
+    return 1;
 }

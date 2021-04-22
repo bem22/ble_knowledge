@@ -129,7 +129,6 @@ int is_in_list(list* list, char* object_path) {
 
     while(head) {
         if(strcmp(head->mac_addr, object_path) == 0) {
-            printf("hello!\n");
             return 1;
         }
     }

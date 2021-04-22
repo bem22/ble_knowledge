@@ -9,6 +9,12 @@ static void
 on_bus_acquired(GDBusConnection *connection,
                 const gchar *name,
                 gpointer loop) {
+
+
+    // TODO: Create hard exit function
+    // TODO: Create soft exit function
+    // TODO: Create 
+
     conn = connection;
     PanoramaObjectSkeleton *object;
     PanoramaOrgBluezAgent1 *agent;
@@ -28,7 +34,12 @@ on_bus_acquired(GDBusConnection *connection,
     g_signal_connect(agent, "handle-request-authorization",
                      G_CALLBACK(on_request_authorization), NULL);
 
-    autopair_init(loop);
+    if(autopair_init(loop)) {
+        g_print("%s\n", "Autopair Started successfully!");
+    } else {
+        g_print("%s", "Failed to start autopairing... exiting");
+        // TODO: Create exit handling function
+    }
 
     panorama_object_skeleton_set_org_bluez_agent1(object, agent);
 
